@@ -1,6 +1,10 @@
 import { Inter } from 'next/font/google';
-import './globals.css';
+import './globals.scss';
 import Navbar from '@/components/layout/Navbar';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { LoadingProvider } from '@/providers/LoadingProvider';
+import Footer from '@/components/layout/Footer';
 
 export const metadata = {
 	title: 'Create Next App',
@@ -10,9 +14,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<body>
-				<Navbar />
-				{children}
+			<body className='text-base-content min-h-screen flex flex-col'>
+				<AuthProvider>
+					<LoadingProvider>
+						<Navbar />
+						<Breadcrumbs />
+						{children}
+						<Footer />
+					</LoadingProvider>
+				</AuthProvider>
 			</body>
 		</html>
 	);
