@@ -17,7 +17,7 @@ export default function Navbar() {
 			setWindowWidth(window.innerWidth);
 		};
 
-		handleResize(); // inicjalne ustawienie
+		handleResize();
 		window.addEventListener('resize', handleResize);
 
 		return () => {

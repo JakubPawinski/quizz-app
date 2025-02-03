@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
 					<LoadingProvider>
 						<Navbar />
 						<Breadcrumbs />
-						{children}
+						<main className='flex-grow'>{children}</main>
 						<Footer />
 					</LoadingProvider>
 				</AuthProvider>
