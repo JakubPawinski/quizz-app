@@ -11,6 +11,7 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
+	const [isLoaded, setIsLoaded] = useState(false);
 
 	useEffect(() => {
 		const checkAuth = async () => {
@@ -18,6 +19,7 @@ export function AuthProvider({ children }) {
 			console.log('token:', token);
 			if (!token) {
 				setUser(null);
+				setIsLoaded(true);
 				return;
 			}
 			try {
@@ -30,16 +32,19 @@ export function AuthProvider({ children }) {
 				if (response.data) {
 					setUser(response.data);
 				}
+				// console.log('User:', response.data);
 			} catch (error) {
 				console.error('Auth error:', error);
 				setUser(null);
+			} finally {
+				setIsLoaded(true);
 			}
 		};
 
 		checkAuth();
 	}, []);
 	return (
-		<AuthContext.Provider value={{ user, setUser }}>
+		<AuthContext.Provider value={{ user, setUser, isLoaded }}>
 			{children}
 		</AuthContext.Provider>
 	);

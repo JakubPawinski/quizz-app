@@ -8,6 +8,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useRouter } from 'next/navigation';
 import SignInGoogle from '@/components/auth/SignInGoogle';
+import { useNotification } from '@/providers/NotificationProvider';
 
 const RegisterSchema = Yup.object().shape({
 	firstName: Yup.string()
@@ -35,6 +36,7 @@ export default function Register() {
 	const router = useRouter();
 	const { setUser } = useAuth();
 	const { setIsLoading } = useLoading();
+	const { showNotification } = useNotification();
 
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
@@ -44,14 +46,19 @@ export default function Register() {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/register`, data, {
 				withCredentials: true,
 			});
+			showNotification(response.data.message, 'success');
 
 			setUser(response.data.userData);
-			router.push('/quizzes');
+			router.push('/auth/verify-email');
 			console.log(response.data);
 			setIsLoading(false);
 		} catch (error) {
 			console.error(error.response.data);
 			setIsLoading(false);
+			showNotification(
+				error.response?.data?.message || 'An error occurred',
+				'error'
+			);
 		}
 	};
 	return (

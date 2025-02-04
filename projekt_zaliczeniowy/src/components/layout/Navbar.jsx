@@ -6,12 +6,14 @@ import { useAuth } from '@/providers/AuthProvider';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 import { useLayoutEffect, useState } from 'react';
-
+import { useNotification } from '@/providers/NotificationProvider';
+import { APP_ROUTES } from '@/utils/config';
 export default function Navbar() {
-	const [windowWidth, setWindowWidth] = useState(0);
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const { user, setUser } = useAuth();
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const { showNotification } = useNotification();
 
+	const [windowWidth, setWindowWidth] = useState(0);
 	useLayoutEffect(() => {
 		const handleResize = () => {
 			setWindowWidth(window.innerWidth);
@@ -24,28 +26,32 @@ export default function Navbar() {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-
 	const isMobile = windowWidth < 770;
 
 	const handleLogout = async () => {
 		try {
-			await axios.post(`${ENDPOINTS.AUTH}/logout`, null, {
+			const response = await axios.post(`${ENDPOINTS.AUTH}/logout`, null, {
 				withCredentials: true,
 			});
 			setUser(null);
+			showNotification(response.data.message, 'success');
 			console.log('User logged out');
 		} catch (error) {
 			console.error(error);
+			showNotification(
+				error.response?.data?.message || 'An error occurred',
+				'error'
+			);
 		}
 	};
 
 	return (
 		<>
-			<nav className='navbar bg-neutral'>
-				<div className='flex-1 navbar-start'>
+			<nav className='navbar bg-neutral flex justify-between items-center p-4'>
+				<div className='flex-start'>
 					<Link
 						className='btn btn-ghost text-xl text-neutral-content'
-						href={'/'}
+						href={APP_ROUTES.HOME}
 					>
 						<div>
 							<span className='m-0 '>Quizz</span>
@@ -54,7 +60,7 @@ export default function Navbar() {
 					</Link>
 				</div>
 
-				<div className='navbar-end'>
+				<div className=' flex-end'>
 					{isMobile ? (
 						<button
 							onClick={() => setIsDrawerOpen(!isDrawerOpen)}
@@ -79,10 +85,22 @@ export default function Navbar() {
 						<>
 							{user ? (
 								<div className='flex items-center space-x-4'>
-									<Link href='/quizzes' className='btn btn-outline btn-primary'>
-										Quizzes
+									<Link
+										href={APP_ROUTES.QUIZZES.LIST}
+										className='btn btn-outline btn-primary'
+									>
+										Explore quizzes
 									</Link>
-									<Link href='/profile' className='btn btn-outline btn-primary'>
+									<Link
+										href={APP_ROUTES.USER.QUIZZES(user._id)}
+										className='btn btn-outline btn-primary'
+									>
+										My quizzes
+									</Link>
+									<Link
+										href={APP_ROUTES.USER.PROFILE(user._id)}
+										className='btn btn-outline btn-primary'
+									>
 										Profile
 									</Link>
 									<button
@@ -95,13 +113,13 @@ export default function Navbar() {
 							) : (
 								<div className='flex items-center space-x-4'>
 									<Link
-										href='/auth/login'
+										href={APP_ROUTES.AUTH.LOGIN}
 										className='btn btn-ghost text-neutral-content'
 									>
 										Login
 									</Link>
 									<Link
-										href='/auth/register'
+										href={APP_ROUTES.AUTH.REGISTER}
 										className='btn btn-primary text-primary-content'
 									>
 										Register
@@ -140,14 +158,21 @@ export default function Navbar() {
 					{user ? (
 						<>
 							<Link
-								href='/quizzes'
+								href={APP_ROUTES.QUIZZES.LIST}
 								className='btn btn-outline btn-primary w-full'
 								onClick={() => setIsDrawerOpen(false)}
 							>
-								Quizzes
+								Explore quizzes
 							</Link>
 							<Link
-								href='/profile'
+								href={APP_ROUTES.USER.QUIZZES(user._id)}
+								className='btn btn-outline btn-primary w-full'
+								onClick={() => setIsDrawerOpen(false)}
+							>
+								My quizzes
+							</Link>
+							<Link
+								href={APP_ROUTES.USER.PROFILE(user._id)}
 								className='btn btn-outline btn-primary w-full'
 								onClick={() => setIsDrawerOpen(false)}
 							>
@@ -166,14 +191,14 @@ export default function Navbar() {
 					) : (
 						<>
 							<Link
-								href='/auth/login'
+								href={APP_ROUTES.AUTH.LOGIN}
 								className='btn btn-outline btn-primary w-full'
 								onClick={() => setIsDrawerOpen(false)}
 							>
 								Login
 							</Link>
 							<Link
-								href='/auth/register'
+								href={APP_ROUTES.AUTH.REGISTER}
 								className='btn btn-primary w-full'
 								onClick={() => setIsDrawerOpen(false)}
 							>

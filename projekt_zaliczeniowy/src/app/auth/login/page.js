@@ -8,6 +8,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/providers/LoadingProvider';
 import SignInGoogle from '@/components/auth/SignInGoogle';
+import { useNotification } from '@/providers/NotificationProvider';
 
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Required'),
@@ -18,6 +19,7 @@ export default function Login() {
 	const router = useRouter();
 	const { setUser } = useAuth();
 	const { setIsLoading } = useLoading();
+	const { showNotification } = useNotification();
 
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
@@ -27,11 +29,16 @@ export default function Login() {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/login`, values, {
 				withCredentials: true,
 			});
+			if (response.data?.message) {
+				// console.log('Show notification:', response.data.message);
+				// console.log(response.data.message);
+				showNotification(response.data.message, 'success');
+			}
 			console.log(response);
 
-			console.log('Document cookies:', document.cookie);
-			console.log('Headers:', response.headers);
-			console.log('Set-Cookie:', response.headers['set-cookie']);
+			// console.log('Document cookies:', document.cookie);
+			// console.log('Headers:', response.headers);
+			// console.log('Set-Cookie:', response.headers['set-cookie']);
 
 			setUser(response.data.userData);
 			router.push('/quizzes');
@@ -40,6 +47,10 @@ export default function Login() {
 		} catch (error) {
 			console.error(error.response.data);
 			setIsLoading(false);
+			showNotification(
+				error.response?.data?.message || 'An error occurred',
+				'error'
+			);
 		}
 	};
 
@@ -104,6 +115,14 @@ export default function Login() {
 						)}
 					</Formik>
 				</div>
+			</div>
+			<div>
+				<Link
+					href='/auth/verify-email'
+					className='block text-sm text-primary hover:text-primary-focus text-center mt-2 hover:underline'
+				>
+					Verify your email
+				</Link>
 			</div>
 			<div className='divider m-auto mt-[20px] mb-[20px]'>OR</div>
 			<SignInGoogle />

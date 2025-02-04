@@ -9,4 +9,22 @@ const ENDPOINTS = {
 	AUTH: `${APIURL}/auth`,
 };
 
-export { ENDPOINTS };
+const APP_ROUTES = {
+	HOME: '/',
+	AUTH: {
+		LOGIN: '/auth/login',
+		REGISTER: '/auth/register',
+		VERIFY: '/auth/verify-email',
+		RESET_PASSWORD: '/auth/reset-password',
+	},
+	QUIZZES: {
+		LIST: '/quizzes',
+		CREATE: '/quizzes/create',
+	},
+	USER: {
+		QUIZZES: (userId) => `/user/${userId}/my-quizzes`,
+		PROFILE: (userId) => `/user/${userId}`,
+	},
+};
+
+export { ENDPOINTS, APP_ROUTES };

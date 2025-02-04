@@ -5,11 +5,13 @@ import axios from 'axios';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { ENDPOINTS } from '@/utils/config';
+import { useNotification } from '@/providers/NotificationProvider';
 
 export default function GoogleCallback() {
 	const router = useRouter();
 	const { setUser } = useAuth();
 	const { setIsLoading } = useLoading();
+	const { showNotification } = useNotification();
 
 	useEffect(() => {
 		const handleAuth = async () => {
@@ -28,10 +30,15 @@ export default function GoogleCallback() {
 					);
 					console.log('res:', res.data);
 					setUser(res.data.userData);
+					showNotification(response.data.message, 'success');
 					router.push('/quizzes');
 					setIsLoading(false);
 				} catch (error) {
 					console.error('Authentication failed', error);
+					showNotification(
+						error.response?.data?.message || 'An error occurred',
+						'error'
+					);
 					router.push('/');
 					setIsLoading(false);
 				}
