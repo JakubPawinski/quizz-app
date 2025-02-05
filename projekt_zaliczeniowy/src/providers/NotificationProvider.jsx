@@ -8,6 +8,8 @@ export function NotificationProvider({ children }) {
 	const [notification, setNotification] = useState(null);
 
 	const showNotification = (message, type = 'info') => {
+		// console.log('message:', message);
+		// console.log('type:', type);
 		setNotification({ message, type });
 		setTimeout(() => setNotification(null), 6000);
 	};

@@ -44,19 +44,19 @@ module.exports = {
 
 					'base-content': '#161416',
 
-					info: '#00cbff',
+					'info': '#00cbff',
 
 					'info-content': '#000f16',
 
-					success: '#00c173',
+					'success': '#00c173',
 
 					'success-content': '#000e05',
 
-					warning: '#b16a00',
+					'warning': '#b16a00',
 
 					'warning-content': '#0c0400',
 
-					error: '#ff7799',
+					'error': '#ff7799',
 
 					'error-content': '#160508',
 				},

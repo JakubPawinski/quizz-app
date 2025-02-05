@@ -72,6 +72,21 @@ export default function Notification({ message, type = 'info' }) {
 	const [isVisible, setIsVisible] = useState(true);
 	const [isFading, setIsFading] = useState(false);
 
+	const getNotificationStyles = (type) => {
+		switch (type) {
+			case 'success':
+				return 'bg-success text-success-content';
+			case 'error':
+				return 'bg-error text-error-content';
+			case 'warning':
+				return 'bg-warning text-warning-content';
+			case 'info':
+				return 'bg-info text-info-content';
+			default:
+				return 'bg-neutral text-neutral-content';
+		}
+	};
+
 	useEffect(() => {
 		// console.log('Notification mounted');
 		// console.log('Message:', message);
@@ -93,7 +108,9 @@ export default function Notification({ message, type = 'info' }) {
       ${isFading ? 'opacity-0' : 'opacity-100'}`}
 		>
 			<div
-				className={`bg-${type} text-${type}-content px-6 py-4 rounded-lg shadow-lg 
+				className={`${getNotificationStyles(
+					type
+				)} px-6 py-4 rounded-lg shadow-lg 
         flex items-center space-x-2 min-w-[300px]`}
 			>
 				{ICONS[type]}

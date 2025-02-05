@@ -3,10 +3,13 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/utils/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import QuizEditForm from '@/components/quiz/QuizEditForm';
 import QuestionManager from '@/components/quiz/QuestionManager';
+import { useNotification } from '@/providers/NotificationProvider';
+import { useAuth } from '@/providers/AuthProvider';
+const { useRouter } = require('next/navigation');
 
 export default function QuizEditPage() {
 	const params = useParams();
@@ -14,6 +17,9 @@ export default function QuizEditPage() {
 	const [quiz, setQuiz] = useState(null);
 	const { setIsLoading } = useLoading();
 	const [categories, setCategories] = useState([]);
+	const { showNotification } = useNotification();
+	const { user } = useAuth();
+	const router = useRouter();
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -48,11 +54,44 @@ export default function QuizEditPage() {
 
 	const handleSubmit = async (values) => {
 		console.log('values:', values);
+
+		try {
+			const response = await axios.patch(
+				`${ENDPOINTS.QUIZ}/${quizId}`,
+				values,
+				{
+					withCredentials: true,
+				}
+			);
+			console.log('response:', response.data);
+			showNotification('Quiz updated successfully', 'success');
+		} catch (error) {
+			console.log(error);
+			showNotification(error.response.data.message, 'error');
+		}
+	};
+
+	const handleDelete = async () => {
+		console.log('Delete quiz');
+		try {
+			const response = await axios.delete(`${ENDPOINTS.QUIZ}/${quizId}`, {
+				withCredentials: true,
+			});
+			console.log('response:', response.data);
+			router.push(APP_ROUTES.USER.QUIZZES(user._id));
+			showNotification('Quiz deleted successfully', 'success');
+		} catch (error) {
+			console.error(error);
+			showNotification(
+				error.response.data.message || 'An occure error',
+				'error'
+			);
+		}
 	};
 
 	const onNewQuestion = () => {
 		console.log('Add new question');
-		console.log('quiz:', quiz);
+		// console.log('quiz:', quiz);
 		setQuiz({
 			...quiz,
 			questions: [
@@ -79,7 +118,14 @@ export default function QuizEditPage() {
 	return (
 		<div className='min-h-screen p-8'>
 			<div className='max-w-4xl mx-auto'>
-				<h1 className='text-3xl font-bold text-neutral mb-8'>Edit your quiz</h1>
+				<div className='flex justify-between items-center'>
+					<h1 className='text-3xl font-bold text-neutral mb-8'>
+						Edit your quiz
+					</h1>
+					<button className='btn btn-primary' onClick={handleDelete}>
+						Delete quiz
+					</button>
+				</div>
 				<QuizEditForm
 					quiz={quiz}
 					categories={categories}
@@ -87,7 +133,7 @@ export default function QuizEditPage() {
 				/>
 				<div className='divider'></div>
 				{quiz.numberOfQuestions > 0 ? (
-					<div className='flex flex-col items-center justify-center space-y-6 p-8 bg-base-200 rounded-lg'>
+					<div className='flex flex-col items-center justify-center space-y-6 p-8 bg-base-100 rounded-lg'>
 						{quiz.questions.map((question) => (
 							<QuestionManager key={question._id} question={question} />
 						))}
@@ -96,10 +142,10 @@ export default function QuizEditPage() {
 						</button>
 					</div>
 				) : (
-					<div className='flex flex-col items-center justify-center space-y-6 p-8 bg-base-200 rounded-lg'>
+					<div className='flex flex-col items-center justify-center space-y-6 p-8 bg-base-100 rounded-lg'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
-							className='h-16 w-16 text-primary' 
+							className='h-16 w-16 text-primary'
 							fill='none'
 							viewBox='0 0 24 24'
 							stroke='currentColor'

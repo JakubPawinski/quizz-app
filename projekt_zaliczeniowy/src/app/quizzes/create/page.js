@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/utils/config';
 import axios from 'axios';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useLoading } from '@/providers/LoadingProvider';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 
 const QuizSchema = Yup.object().shape({
 	name: Yup.string()
@@ -21,6 +23,8 @@ export default function CreateQuizPage() {
 	const [categories, setCategories] = useState([]);
 	const { showNotification } = useNotification();
 	const { setIsLoading } = useLoading();
+	const { user } = useAuth();
+	const router = useRouter();
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -40,6 +44,7 @@ export default function CreateQuizPage() {
 			});
 			console.log(response.data);
 			showNotification(response.data.message, 'success');
+			router.push(`${APP_ROUTES.USER.QUIZZES(user._id)}`);
 		} catch (error) {
 			console.error(error.response.data);
 			showNotification(

@@ -26,11 +26,13 @@ export default function UserQuizzesPage() {
 			try {
 				const response = await axios.get(`${ENDPOINTS.USER}/${user._id}`);
 				const quizPromises = response.data.quizzes.map((quizId) =>
-					axios.get(`${ENDPOINTS.QUIZ}/${quizId}`)
+					axios.get(`${ENDPOINTS.QUIZ}/${quizId}`, {
+						withCredentials: true,
+					})
 				);
 				const quizzesResponse = await Promise.all(quizPromises);
 				const quizzesData = quizzesResponse.map((quiz) => quiz.data.data);
-				console.log('response:', quizzesData);
+				// console.log('response:', quizPromises);
 				setQuizzes(quizzesData);
 				setIsLoading(false);
 			} catch (error) {
