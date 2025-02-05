@@ -20,10 +20,12 @@ const APP_ROUTES = {
 	QUIZZES: {
 		LIST: '/quizzes',
 		CREATE: '/quizzes/create',
+		QUIZ: (quizId) => `/quizzes/${quizId}`,
 	},
 	USER: {
 		QUIZZES: (userId) => `/user/${userId}/my-quizzes`,
 		PROFILE: (userId) => `/user/${userId}`,
+		QUIZ_EDIT: (userId, quizId) => `/user/${userId}/my-quizzes/${quizId}`,
 	},
 };
 

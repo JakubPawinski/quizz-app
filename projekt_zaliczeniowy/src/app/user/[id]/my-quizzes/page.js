@@ -39,7 +39,7 @@ export default function UserQuizzesPage() {
 			}
 		};
 		fetchUserQuizzes();
-	}, [user, isLoaded]);
+	}, [user, isLoaded, setIsLoading]);
 	return (
 		<div className='min-h-screen p-8'>
 			<div className='max-w-7xl mx-auto'>
@@ -53,7 +53,7 @@ export default function UserQuizzesPage() {
 				{quizzes.length === 0 ? (
 					<div className='text-center py-12'>
 						<h3 className='text-xl text-neutral-content mb-4'>
-							You haven't created any quizzes yet
+							You have not created any quizzes yet
 						</h3>
 						<p className='text-neutral-content mb-8'>
 							Click the button below to create your first quiz

@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { APP_ROUTES } from '@/utils/config';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function QuizCard({ quiz }) {
+	const pathname = usePathname();
+	const router = useRouter();
+	const { user } = useAuth();
 	const getDifficultyColor = (difficulty) => {
 		switch (difficulty) {
 			case 'Easy':
@@ -13,10 +20,19 @@ export default function QuizCard({ quiz }) {
 				return 'bg-gray-100 text-gray-800';
 		}
 	};
-	useEffect(() => {
+
+	const handleClick = () => {
+		console.log('Handle click');
 		console.log('quiz:', quiz);
-		return () => {};
-	}, []);
+		console.log('router:', pathname);
+
+		if (pathname.includes('user')) {
+			router.push(`${APP_ROUTES.USER.QUIZ_EDIT(user._id, quiz._id)}`);
+		} else {
+			router.push(`${APP_ROUTES.QUIZZES.QUIZ(quiz._id)}`);
+			// console.log(`${APP_ROUTES.QUIZZES.QUIZ(quiz._id)}`);
+		}
+	};
 
 	return (
 		<div className='card bg-base-100 w-96 shadow-xl hover:shadow-2xl transition-shadow'>
@@ -61,7 +77,9 @@ export default function QuizCard({ quiz }) {
 				</div>
 
 				<div className='card-actions justify-end'>
-					<button className='btn btn-primary'>See more</button>
+					<button className='btn btn-primary' onClick={handleClick}>
+						See more
+					</button>
 				</div>
 			</div>
 		</div>
