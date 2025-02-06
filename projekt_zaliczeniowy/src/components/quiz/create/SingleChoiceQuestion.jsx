@@ -26,13 +26,24 @@ const initialValues = {
 		{ content: '', isCorrect: false },
 	],
 	hint: '',
-	timeLimit: 0,
+	timeLimit: 15,
 };
 
-export default function SingleChoiceQuestion({ onSubmit }) {
+export default function SingleChoiceQuestion({ onSubmit, defaultValues }) {
+	const startingValues = defaultValues
+		? {
+				...initialValues,
+				content: defaultValues.content || '',
+				answers: defaultValues.answers || initialValues.answers,
+				hint: defaultValues.hint || '',
+				timeLimit: defaultValues.timeLimit || 15,
+				type: 'Single Choice',
+		  }
+		: initialValues;
+
 	return (
 		<Formik
-			initialValues={initialValues}
+			initialValues={startingValues}
 			validationSchema={validationSchema}
 			onSubmit={onSubmit}
 		>

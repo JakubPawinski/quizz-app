@@ -29,17 +29,23 @@ const initialValues = {
 	content: '',
 	answers: [{ content: '', isCorrect: true }],
 	hint: '',
-	timeLimit: 0,
+	timeLimit: 15,
 };
 
-export default function FillInTheBlankQuestion({ quizId }) {
-	const onSubmit = async (values) => {
-		console.log(values);
-	};
-
+export default function FillInTheBlankQuestion({ onSubmit, defaultValues }) {
+	const startingValues = defaultValues
+		? {
+				...initialValues,
+				content: defaultValues.content || '',
+				answers: defaultValues.answers || initialValues.answers,
+				hint: defaultValues.hint || '',
+				timeLimit: defaultValues.timeLimit || 15,
+				type: 'Fill in the Blank',
+		  }
+		: initialValues;
 	return (
 		<Formik
-			initialValues={initialValues}
+			initialValues={startingValues}
 			validationSchema={validationSchema}
 			onSubmit={onSubmit}
 		>

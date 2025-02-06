@@ -35,7 +35,7 @@ export default function QuizEditPage() {
 			setIsLoading(true);
 			try {
 				const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
-				console.log('response:', response.data.data);
+				// console.log('response:', response.data.data);
 
 				setQuiz(response.data.data);
 			} catch (error) {
@@ -44,7 +44,13 @@ export default function QuizEditPage() {
 				setIsLoading(false);
 			}
 		};
+
+		window.addEventListener('refreshQuiz', fetchQuiz);
 		fetchQuiz();
+
+		return () => {
+			window.removeEventListener('refreshQuiz', fetchQuiz);
+		};
 	}, [quizId, setIsLoading]);
 
 	useEffect(() => {
@@ -135,7 +141,11 @@ export default function QuizEditPage() {
 				{quiz.numberOfQuestions > 0 ? (
 					<div className='flex flex-col items-center justify-center space-y-6 p-8 bg-base-100 rounded-lg'>
 						{quiz.questions.map((question) => (
-							<QuestionManager key={question._id} question={question} />
+							<QuestionManager
+								key={question._id}
+								question={question}
+								quizId={quizId}
+							/>
 						))}
 						<button className='btn btn-primary' onClick={onNewQuestion}>
 							Add question

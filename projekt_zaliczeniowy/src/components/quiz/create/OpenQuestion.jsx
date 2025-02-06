@@ -3,7 +3,14 @@ import * as Yup from 'yup';
 
 const validationSchema = Yup.object({
 	content: Yup.string().required('Question content is required'),
-	correctAnswer: Yup.string().required('Correct answer is required'),
+	answers: Yup.array()
+		.of(
+			Yup.object({
+				content: Yup.string().required('Answer content is required'),
+				isCorrect: Yup.boolean().required(),
+			})
+		)
+		.min(1, 'At least one answer is required'),
 	hint: Yup.string(),
 	timeLimit: Yup.number().min(0, 'Time cannot be negative'),
 });
@@ -11,19 +18,25 @@ const validationSchema = Yup.object({
 const initialValues = {
 	type: 'Open',
 	content: '',
-	correctAnswer: '',
+	answers: [{ content: '', isCorrect: true }],
 	hint: '',
-	timeLimit: 0,
+	timeLimit: 15,
 };
 
-export default function OpenQuestion({ quizId }) {
-	const onSubmit = async (values) => {
-		console.log('values:', values);
-	};
-
+export default function OpenQuestion({ onSubmit, defaultValues }) {
+	const startingValues = defaultValues
+		? {
+				...initialValues,
+				content: defaultValues.content || '',
+				answers: defaultValues.answers || initialValues.answers,
+				hint: defaultValues.hint || '',
+				timeLimit: defaultValues.timeLimit || 15,
+				type: 'Open',
+		  }
+		: initialValues;
 	return (
 		<Formik
-			initialValues={initialValues}
+			initialValues={startingValues}
 			validationSchema={validationSchema}
 			onSubmit={onSubmit}
 		>
@@ -43,14 +56,14 @@ export default function OpenQuestion({ quizId }) {
 
 					<div className='mb-6'>
 						<Field
-							name='correctAnswer'
+							name='answers[0].content'
 							as='textarea'
 							className='textarea textarea-bordered w-full h-20 bg-base-100'
 							placeholder='Enter the correct answer here...'
 						/>
-						{errors.correctAnswer && touched.correctAnswer && (
+						{errors.answers?.[0]?.content && touched.answers?.[0]?.content && (
 							<div className='text-error text-sm mt-1'>
-								{errors.correctAnswer}
+								{errors.answers[0].content}
 							</div>
 						)}
 					</div>

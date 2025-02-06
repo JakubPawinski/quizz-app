@@ -30,16 +30,23 @@ const initialValues = {
 		{ content: '', isCorrect: false },
 	],
 	hint: '',
-	timeLimit: 0,
+	timeLimit: 15,
 };
 
-export default function MultipleChoiceQuestion({ quizId }) {
-	const onSubmit = async (values) => {
-		console.log('values:', values);
-	};
+export default function MultipleChoiceQuestion({ onSubmit, defaultValues }) {
+	const startingValues = defaultValues
+		? {
+				...initialValues,
+				content: defaultValues.content || '',
+				answers: defaultValues.answers || initialValues.answers,
+				hint: defaultValues.hint || '',
+				timeLimit: defaultValues.timeLimit || 15,
+				type: 'Multiple Choice',
+		  }
+		: initialValues;
 	return (
 		<Formik
-			initialValues={initialValues}
+			initialValues={startingValues}
 			validationSchema={validationSchema}
 			onSubmit={onSubmit}
 		>

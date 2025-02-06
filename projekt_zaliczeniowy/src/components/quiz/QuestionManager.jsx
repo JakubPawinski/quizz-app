@@ -4,54 +4,188 @@ import SingleChoiceQuestion from './create/SingleChoiceQuestion';
 import MultipleChoiceQuestion from './create/MultipleChoiceQuestion';
 import OpenQuestion from './create/OpenQuestion';
 import FillInTheBlankQuestion from './create/FillInTheBlankQuestion';
+import axios from 'axios';
+import { ENDPOINTS } from '@/utils/config';
+import { useNotification } from '@/providers/NotificationProvider';
 
-export default function QuestionManager({ question }) {
-	const [selectedType, setSelectedType] = useState('Single choice');
+export default function QuestionManager({ question, quizId }) {
+	const [selectedType, setSelectedType] = useState(question?.type || '');
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const { showNotification } = useNotification();
+
+	useEffect(() => {
+		if (question.placeholder) {
+			setIsDetailsOpen(true);
+		}
+	}, []);
 
 	const handleTypeChange = (type) => {
 		setSelectedType(type);
-		console.log('Selected type:', type);
+		// console.log('Selected type:', type);
 	};
 	useEffect(() => {
-		setSelectedType(question.type);
-		return () => {};
+		if (question && question.type) {
+			console.log('Selected type:', question.type);
+			setSelectedType(question.type);
+		}
 	}, [question]);
+
+	const handleSubmit = async (values) => {
+		console.log(values);
+		// console.log('quizId:', quizId);
+
+		try {
+			console.log(question.placeholder);
+			if (question.placeholder) {
+				// console.log('Create question:', values);
+				const response = await axios.post(
+					`${ENDPOINTS.QUIZ}/${quizId}/questions`,
+					values,
+					{
+						withCredentials: true,
+					}
+				);
+				// console.log('response:', response);
+				showNotification('Question created successfully', 'success');
+			} else {
+				// console.log('Update question:', question._id);
+				const response = await axios.patch(
+					`${ENDPOINTS.QUIZ}/${quizId}/questions/${question._id}`,
+					values,
+					{
+						withCredentials: true,
+					}
+				);
+				// console.log('response:', response);
+				showNotification('Question updated successfully', 'success');
+			}
+		} catch (error) {
+			console.log(error);
+			showNotification(error.response.data.message, 'error');
+		} finally {
+			dispatchEvent(new Event('refreshQuiz'));
+			setIsDetailsOpen(false);
+		}
+	};
+	const handleDeleteQuestion = async () => {
+		// console.log('Delete question:', question._id);
+		if (question.placeholder) {
+			dispatchEvent(new Event('refreshQuiz'));
+			return;
+		}
+
+		try {
+			const response = await axios.delete(
+				`${ENDPOINTS.QUIZ}/${quizId}/questions/${question._id}`,
+				{
+					withCredentials: true,
+				}
+			);
+			// console.log('response:', response);
+			showNotification('Question deleted successfully', 'success');
+		} catch (error) {
+			// console.error(error);
+			showNotification(error.response.data.message, 'error');
+		} finally {
+			console.log('dispatchEvent');
+			dispatchEvent(new Event('refreshQuiz'));
+		}
+	};
 
 	return (
 		<div className='card bg-base-200 mx-auto w-full p-4'>
-			<div className='flex flex-wrap gap-4 '>
-				<div className='question-types flex flex-col sm:flex-row gap-4 w-full justify-center'>
-					{[
-						{ value: 'Single choice', label: 'Single choice' },
-						{ value: 'Multiple choice', label: 'Multiple choice' },
-						{ value: 'Open question', label: 'Open question' },
-						{ value: 'Fill in the blank', label: 'Fill in the blank' },
-					].map((type) => (
-						<label
-							key={type.value}
-							className={`
-				  flex items-center gap-2 p-3 rounded-lg cursor-pointer
-				  transition-all duration-200 
-				  ${selectedType === type.value ? 'bg-primary/20' : ''}
-				`}
-						>
-							<input
-								type='radio'
-								name='questionType'
-								value={type.value}
-								checked={selectedType === type.value}
-								onChange={() => handleTypeChange(type.value)}
-								className='radio radio-primary'
-							/>
-							<span className='font-medium'>{type.label}</span>
-						</label>
-					))}
+			{!isDetailsOpen && (
+				<div className='card bg-base-200 mx-auto w-full p-6 '>
+					<div className='flex justify-between items-center gap-4'>
+						<div className='flex-1 space-y-4'>
+							<div className='text-lg font-medium text-base-content'>
+								{question.content}
+							</div>
+							<div className='flex gap-6'>
+								<div className='flex items-center gap-2'>
+									<p className='text-secondary font-semibold'>Type:</p>
+									<span className='text-base-content'>{question.type}</span>
+								</div>
+								<div className='flex items-center gap-2'>
+									<p className='text-secondary font-semibold'>Time:</p>
+									<span className='text-base-content'>
+										{question.timeLimit}s
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<div className='flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto'>
+							<button
+								onClick={() => setIsDetailsOpen(true)}
+								className='btn btn-primary btn-sm w-full sm:w-auto'
+							>
+								Edit
+							</button>
+							<button
+								onClick={handleDeleteQuestion}
+								className='btn btn-error btn-sm btn-outline w-full sm:w-auto'
+							>
+								Delete
+							</button>
+						</div>
+					</div>
 				</div>
-			</div>
-			{selectedType === 'Single choice' && <SingleChoiceQuestion />}
-			{selectedType === 'Multiple choice' && <MultipleChoiceQuestion />}
-			{selectedType === 'Open question' && <OpenQuestion />}
-			{selectedType === 'Fill in the blank' && <FillInTheBlankQuestion />}
+			)}
+
+			{isDetailsOpen && (
+				<div className='card bg-base-200 mx-auto w-full p-4'>
+					<div className='flex flex-wrap gap-4 '>
+						<div className='flex flex-col sm:flex-row gap-4'>
+							{[
+								'Single Choice',
+								'Multiple Choice',
+								'Open',
+								'Fill in the Blank',
+							].map((type) => (
+								<label
+									key={type}
+									className={`
+      flex items-center gap-2 p-3 rounded-lg cursor-pointer
+      ${selectedType === type ? 'bg-primary/20' : 'bg-base-200'}
+    `}
+								>
+									<input
+										type='radio'
+										name='questionType'
+										value={type}
+										checked={selectedType === type}
+										onChange={() => handleTypeChange(type)}
+										className='radio radio-primary'
+									/>
+									<span>{type}</span>
+								</label>
+							))}
+						</div>
+					</div>
+					{selectedType === 'Single Choice' && (
+						<SingleChoiceQuestion
+							onSubmit={handleSubmit}
+							defaultValues={question}
+						/>
+					)}
+					{selectedType === 'Multiple Choice' && (
+						<MultipleChoiceQuestion
+							onSubmit={handleSubmit}
+							defaultValues={question}
+						/>
+					)}
+					{selectedType === 'Open' && (
+						<OpenQuestion onSubmit={handleSubmit} defaultValues={question} />
+					)}
+					{selectedType === 'Fill in the Blank' && (
+						<FillInTheBlankQuestion
+							onSubmit={handleSubmit}
+							defaultValues={question}
+						/>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }
