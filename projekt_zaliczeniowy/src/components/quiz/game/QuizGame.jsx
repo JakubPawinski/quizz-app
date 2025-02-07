@@ -1,9 +1,16 @@
 'use client';
 import { useEffect, useState, useReducer, useMemo } from 'react';
 import _ from 'lodash';
+import Link from 'next/link';
+import axios from 'axios';
 import TimeCounter from './TimeCounter';
 
-const START_TIME = 3;
+import SingleChoiceGame from './questionTypes/SingleChoiceGame';
+import MultipleChoiceGame from './questionTypes/MultipleChoiceGame';
+import OpenQuestionGame from './questionTypes/OpenQuestionGame';
+import FillInTheBlankGame from './questionTypes/FillInTheBlankGame';
+
+const START_TIME = 1;
 
 const ACTIONS = {
 	SET_QUESTIONS: 'set_questions',
@@ -12,6 +19,9 @@ const ACTIONS = {
 	SET_TIMER_ACTIVE: 'set_timer_active',
 	SET_TIME_LIMIT: 'set_time_limit',
 	SET_FINISHED: 'set_finished',
+	SET_ANSWERS: 'set_answers',
+	SET_STATISTICS: 'set_statistics',
+	SET_SHOWING_ANSWER: 'set_showing_answer',
 };
 const initialState = {
 	questions: [],
@@ -20,6 +30,9 @@ const initialState = {
 	timeLimit: 10,
 	isTimerActive: false,
 	isFinished: false,
+	answers: {},
+	statistics: null,
+	showingAnswer: false,
 };
 function quizReducer(state, action) {
 	switch (action.type) {
@@ -35,6 +48,12 @@ function quizReducer(state, action) {
 			return { ...state, timeLimit: action.payload };
 		case ACTIONS.SET_FINISHED:
 			return { ...state, isFinished: action.payload };
+		case ACTIONS.SET_ANSWERS:
+			return { ...state, answers: action.payload };
+		case ACTIONS.SET_STATISTICS:
+			return { ...state, statistics: action.payload };
+		case ACTIONS.SET_SHOWING_ANSWER:
+			return { ...state, showingAnswer: action.payload };
 		default:
 			return state;
 	}
@@ -97,12 +116,79 @@ export default function QuizGame({ quiz }) {
 		}, 1000);
 	};
 
+	const handleAnswer = (answer) => {
+		dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: false });
+		dispatch({ type: ACTIONS.SET_SHOWING_ANSWER, payload: true });
+		const newAnswers = {
+			...state.answers,
+			[currentQuestion._id]: answer,
+		};
+
+		dispatch({ type: ACTIONS.SET_ANSWERS, payload: newAnswers });
+		console.log('Answers after update:', newAnswers);
+
+		setTimeout(() => {
+			dispatch({ type: ACTIONS.SET_SHOWING_ANSWER, payload: false });
+
+			if (state.currentQuestionIndex >= state.questions.length - 1) {
+				const finalAnswers = {
+					...newAnswers,
+					[currentQuestion._id]: answer,
+				};
+				dispatch({ type: ACTIONS.SET_ANSWERS, payload: finalAnswers });
+				dispatch({ type: ACTIONS.SET_FINISHED, payload: true });
+				handleQuizComplete(finalAnswers);
+			} else {
+				dispatch({
+					type: ACTIONS.SET_CURRENT_QUESTION,
+					payload: state.currentQuestionIndex + 1,
+				});
+				dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: true });
+			}
+		}, 2000);
+	};
+
+	const handleQuizComplete = async (finalAnswers) => {
+		console.log('Final answers:', finalAnswers);
+	};
+
 	const renderQuestion = () => {
 		if (!currentQuestion) return null;
 
 		return (
 			<div className='w-full'>
-				<h2>{currentQuestion.content}</h2>
+				{questionType === 'Single choice' && (
+					<SingleChoiceGame
+						question={currentQuestion}
+						onTimeEnd={handleTimeEnd}
+						onAnswer={handleAnswer}
+						showingAnswer={state.showingAnswer}
+					/>
+				)}
+				{questionType === 'Multiple choice' && (
+					<MultipleChoiceGame
+						question={currentQuestion}
+						onTimeEnd={handleTimeEnd}
+						onAnswer={handleAnswer}
+						showingAnswer={state.showingAnswer}
+					/>
+				)}
+				{questionType === 'Open question' && (
+					<OpenQuestionGame
+						question={currentQuestion}
+						onTimeEnd={handleTimeEnd}
+						onAnswer={handleAnswer}
+						showingAnswer={state.showingAnswer}
+					/>
+				)}
+				{questionType === 'Fill in the Blank' && (
+					<FillInTheBlankGame
+						question={currentQuestion}
+						onTimeEnd={handleTimeEnd}
+						onAnswer={handleAnswer}
+						showingAnswer={state.showingAnswer}
+					/>
+				)}
 			</div>
 		);
 	};
@@ -110,7 +196,53 @@ export default function QuizGame({ quiz }) {
 	if (state.isFinished) {
 		return (
 			<div className='text-center p-8'>
-				<h2 className='text-2xl font-bold text-primary mb-4'>Quiz finished!</h2>
+				<h2 className='text-2xl font-bold text-primary mb-4'>
+					Quiz Completed!
+				</h2>
+
+				<div className='stats stats-vertical lg:stats-horizontal shadow bg-base-200'>
+					<div className='stat'>
+						<div className='stat-title'>Correct Answers</div>
+						<div className='stat-value text-primary'>
+							{state.statistics?.correctAnswersCount}
+						</div>
+						<div className='stat-desc'>
+							out of {state.questions.length} questions
+						</div>
+					</div>
+
+					<div className='stat'>
+						<div className='stat-title'>Accuracy</div>
+						<div className='stat-value text-accent'>
+							{state.statistics?.correctAnswersPercentage}%
+						</div>
+						<div className='stat-desc'>of answers were correct</div>
+					</div>
+					<div className='stat'>
+						<div className='stat-title'>Total Score</div>
+						<div className='stat-value text-secondary'>
+							{state.statistics?.score}
+						</div>
+						<div className='stat-desc'>points earned</div>
+					</div>
+				</div>
+
+				<div className='mt-8 flex flex-col gap-4'>
+					<button
+						className='btn btn-primary'
+						onClick={() => window.location.reload()}
+					>
+						Try Again
+					</button>
+					<Link href='/dashboard' className='btn btn-outline'>
+						Back to Dashboard
+					</Link>
+				</div>
+
+				<div className='mt-4 text-sm text-base-content/60'>
+					Completed on:{' '}
+					{new Date(state.statistics?.createdAt).toLocaleDateString()}
+				</div>
 			</div>
 		);
 	}
