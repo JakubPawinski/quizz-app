@@ -5,6 +5,9 @@ import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import QuizGame from '@/components/quiz/game/QuizGame';
+import Comment from '@/components/quiz/comments/comment';
+import AddComment from '@/components/quiz/comments/AddComment';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function QuizPage() {
 	const [isStarted, setIsStarted] = useState(false);
@@ -12,19 +15,22 @@ export default function QuizPage() {
 	const [quizRanking, setQuizRanking] = useState([]);
 	const { quizId } = useParams();
 	const { setIsLoading } = useLoading();
+	const [refreshRank, setRefreshRank] = useState(false);
+	const { user } = useAuth();
 
-	const sampleQuizData = {
-		title: 'Programming Quiz',
-		description: 'Test your programming knowledge!',
-		topScores: [
-			{ name: 'John', score: 95 },
-			{ name: 'Mark', score: 90 },
-			{ name: 'Kate', score: 85 },
-		],
-		comments: [
-			{ author: 'Mike', text: 'Great quiz!' },
-			{ author: 'Sarah', text: 'Very educational' },
-		],
+	const handleCommentDelete = (commentId) => {
+		setQuiz((prevQuiz) => ({
+			...prevQuiz,
+			comments: prevQuiz.comments.filter(
+				(comment) => comment._id !== commentId
+			),
+		}));
+	};
+	const handleCommentAdded = (newComment) => {
+		setQuiz((prevQuiz) => ({
+			...prevQuiz,
+			comments: [newComment, ...prevQuiz.comments],
+		}));
 	};
 
 	useEffect(() => {
@@ -34,7 +40,7 @@ export default function QuizPage() {
 		const fetchQuiz = async () => {
 			try {
 				const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
-				// console.log('response:', response.data.data);
+				// console.log('response:', response.data.data.comments);
 				setQuiz(response.data.data);
 			} catch (error) {
 				console.error(error);
@@ -45,16 +51,16 @@ export default function QuizPage() {
 		const fetchQuizRanking = async () => {
 			try {
 				const response = await axios.get(`${ENDPOINTS.RANKING}/${quizId}/3`);
-
+				// console.log('ranking:', response.data.data);
 				const ranking = response.data.data ? response.data.data : [];
 				setQuizRanking(ranking);
 			} catch (error) {
-				console.error(error);
+				console.log(error);
 			}
 		};
 		fetchQuiz();
 		fetchQuizRanking();
-	}, []);
+	}, [quizId, setIsLoading, refreshRank]);
 
 	if (!quiz) {
 		return (
@@ -95,7 +101,10 @@ export default function QuizPage() {
 						<div className='card bg-base-200 shadow-xl'>
 							<div className='card-body'>
 								<div>
-									<QuizGame quiz={quiz} />
+									<QuizGame
+										quiz={quiz}
+										onFinish={() => setRefreshRank(!refreshRank)}
+									/>
 								</div>
 							</div>
 						</div>
@@ -109,24 +118,31 @@ export default function QuizPage() {
 						<div className='card-body'>
 							<h2 className='card-title text-xl mb-4'>Top Scores</h2>
 							<ul className='space-y-2'>
-								{quizRanking.length > 0 ? (
+								{quizRanking.length > 0 && quizRanking ? (
 									quizRanking.map((user, index) => (
 										<li
 											key={index}
 											className='flex justify-between items-center p-2 bg-base-100 rounded-lg'
 										>
-											<span className='font-medium'>
-												<p>{user.firstName}</p>
-												<p>{user.lastName}</p>
+											<span className='flex items-center gap-2 font-medium'>
+												<span className='w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full text-primary'>
+													{user.rank}
+												</span>
+												<span className='text-base-content'>
+													{user.nickname}
+												</span>
 											</span>
 											<span className='badge badge-primary'>
-												{user.averageScore} pts
+												{user.stats.averageCorrectAnswersPercentage} %
 											</span>
 										</li>
 									))
 								) : (
 									<p className='text-base-content'>No scores yet</p>
 								)}
+								<p className='text-xs text-base-content/70 italic'>
+									Ranking based on average correct answers percentage
+								</p>
 							</ul>
 						</div>
 					</div>
@@ -135,18 +151,25 @@ export default function QuizPage() {
 					<div className='card bg-base-200 shadow-xl'>
 						<div className='card-body'>
 							<h2 className='card-title text-xl mb-4'>Comments</h2>
-							<div className='space-y-4'>
-								{sampleQuizData.comments.map((comment, index) => (
-									<div key={index} className='bg-base-100 p-4 rounded-lg'>
-										<p className='font-medium text-primary'>{comment.author}</p>
-										<p className='text-base-content/80'>{comment.text}</p>
-									</div>
-								))}
+							<div className='space-y-4 max-h-96 overflow-y-auto'>
+								{quiz.comments
+									.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+									.map((comment, index) => {
+										return (
+											<Comment
+												key={index}
+												comment={comment}
+												onDelete={handleCommentDelete}
+												quizId={quizId}
+											/>
+										);
+									})}
 							</div>
 							<div className='mt-4'>
-								<button className='btn btn-outline btn-primary w-full'>
-									Add Comment
-								</button>
+								<AddComment
+									quizId={quizId}
+									onCommentAdded={handleCommentAdded}
+								/>
 							</div>
 						</div>
 					</div>

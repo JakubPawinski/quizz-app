@@ -4,11 +4,14 @@ import _ from 'lodash';
 import Link from 'next/link';
 import axios from 'axios';
 import TimeCounter from './TimeCounter';
+import { ENDPOINTS } from '@/utils/config';
+import { useAuth } from '@/providers/AuthProvider';
 
 import SingleChoiceGame from './questionTypes/SingleChoiceGame';
 import MultipleChoiceGame from './questionTypes/MultipleChoiceGame';
 import OpenQuestionGame from './questionTypes/OpenQuestionGame';
 import FillInTheBlankGame from './questionTypes/FillInTheBlankGame';
+import Hints from './questionTypes/Hints';
 
 const START_TIME = 1;
 
@@ -61,8 +64,9 @@ function quizReducer(state, action) {
 
 const shuffleArray = (array) => _.shuffle(array);
 
-export default function QuizGame({ quiz }) {
+export default function QuizGame({ quiz, onFinish }) {
 	const [state, dispatch] = useReducer(quizReducer, initialState);
+	const { user } = useAuth();
 
 	const currentQuestion = useMemo(
 		() => state.questions[state.currentQuestionIndex],
@@ -103,8 +107,19 @@ export default function QuizGame({ quiz }) {
 	const handleTimeEnd = () => {
 		dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: false });
 
+		// console.log('Time out');
+		const newAnswers = {
+			...state.answers,
+			[currentQuestion._id]: 'Time out',
+		};
+		dispatch({
+			type: ACTIONS.SET_ANSWERS,
+			payload: newAnswers,
+		});
+
 		if (state.currentQuestionIndex >= state.questions.length - 1) {
 			dispatch({ type: ACTIONS.SET_FINISHED, payload: true });
+			handleQuizComplete(newAnswers);
 			return;
 		}
 
@@ -125,7 +140,7 @@ export default function QuizGame({ quiz }) {
 		};
 
 		dispatch({ type: ACTIONS.SET_ANSWERS, payload: newAnswers });
-		console.log('Answers after update:', newAnswers);
+		// console.log('Answers after update:', newAnswers);
 
 		setTimeout(() => {
 			dispatch({ type: ACTIONS.SET_SHOWING_ANSWER, payload: false });
@@ -150,13 +165,52 @@ export default function QuizGame({ quiz }) {
 
 	const handleQuizComplete = async (finalAnswers) => {
 		console.log('Final answers:', finalAnswers);
+		const formattedAnswers = {
+			quizId: quiz._id,
+			answers: Object.keys(finalAnswers).map((questionId) => {
+				const answer = finalAnswers[questionId];
+				if (Array.isArray(answer)) {
+					return {
+						questionId,
+						answers: answer.map((ans) =>
+							typeof ans === 'string' ? ans : ans.content
+						),
+					};
+				}
+				if (typeof answer === 'object') {
+					return {
+						questionId,
+						answers: [answer.content],
+					};
+				}
+				return {
+					questionId,
+					answers: [answer],
+				};
+			}),
+		};
+		// console.log('Formatted answers:', formattedAnswers);
+		try {
+			const response = await axios.post(
+				`${ENDPOINTS.USER}/${user._id}/stats`,
+				formattedAnswers,
+				{
+					withCredentials: true,
+				}
+			);
+			dispatch({ type: ACTIONS.SET_STATISTICS, payload: response.data.data });
+			onFinish();
+			// console.log('Quiz completed:', response.data.data);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const renderQuestion = () => {
 		if (!currentQuestion) return null;
 
 		return (
-			<div className='w-full'>
+			<div className='w-full question-box'>
 				{questionType === 'Single choice' && (
 					<SingleChoiceGame
 						question={currentQuestion}
@@ -189,6 +243,7 @@ export default function QuizGame({ quiz }) {
 						showingAnswer={state.showingAnswer}
 					/>
 				)}
+				<Hints question={currentQuestion} showingAnswer={state.showingAnswer} />
 			</div>
 		);
 	};
@@ -200,32 +255,39 @@ export default function QuizGame({ quiz }) {
 					Quiz Completed!
 				</h2>
 
-				<div className='stats stats-vertical lg:stats-horizontal shadow bg-base-200'>
-					<div className='stat'>
-						<div className='stat-title'>Correct Answers</div>
-						<div className='stat-value text-primary'>
-							{state.statistics?.correctAnswersCount}
+				{state.statistics ? (
+					<div className='stats stats-vertical lg:stats-horizontal shadow bg-base-200'>
+						<div className='stat'>
+							<div className='stat-title'>Correct Answers</div>
+							<div className='stat-value text-primary'>
+								{state.statistics?.correctAnswersCount}
+							</div>
+							<div className='stat-desc'>
+								out of {state.questions.length} questions
+							</div>
 						</div>
-						<div className='stat-desc'>
-							out of {state.questions.length} questions
-						</div>
-					</div>
 
-					<div className='stat'>
-						<div className='stat-title'>Accuracy</div>
-						<div className='stat-value text-accent'>
-							{state.statistics?.correctAnswersPercentage}%
+						<div className='stat'>
+							<div className='stat-title'>Accuracy</div>
+							<div className='stat-value text-accent'>
+								{state.statistics?.correctAnswersPercentage}%
+							</div>
+							<div className='stat-desc'>of answers were correct</div>
 						</div>
-						<div className='stat-desc'>of answers were correct</div>
-					</div>
-					<div className='stat'>
-						<div className='stat-title'>Total Score</div>
-						<div className='stat-value text-secondary'>
-							{state.statistics?.score}
+						<div className='stat'>
+							<div className='stat-title'>Total Score</div>
+							<div className='stat-value text-secondary'>
+								{state.statistics?.score}
+							</div>
+							<div className='stat-desc'>points earned</div>
 						</div>
-						<div className='stat-desc'>points earned</div>
 					</div>
-				</div>
+				) : (
+					<div className='text-base-content flex flex-col items-center gap-4'>
+						<span className='loading loading-spinner loading-sm'></span>
+						<p>Calculating results...</p>
+					</div>
+				)}
 
 				<div className='mt-8 flex flex-col gap-4'>
 					<button
@@ -234,24 +296,24 @@ export default function QuizGame({ quiz }) {
 					>
 						Try Again
 					</button>
-					<Link href='/dashboard' className='btn btn-outline'>
-						Back to Dashboard
+					<Link href='/quizzes' className='btn btn-outline'>
+						Back to all quizzes
 					</Link>
 				</div>
 
 				<div className='mt-4 text-sm text-base-content/60'>
 					Completed on:{' '}
-					{new Date(state.statistics?.createdAt).toLocaleDateString()}
+					{new Date(state.statistics?.timestamp).toLocaleDateString()}
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className='relative flex flex-col items-center justify-center min-h-[400px] p-8'>
+		<div className='relative flex flex-col items-center justify-center min-h-[400px]'>
 			{!state.isGameActive ? (
 				<div className='text-center space-y-6'>
-					<div className='text-2xl font-bold text-primary'>
+					<div className='text-2xl font-bold text-primary w-full mx-0'>
 						Your game starts in:
 					</div>
 					<div className='p-8 bg-base-200 rounded-xl text-accent flex items-center justify-center '>
@@ -271,16 +333,16 @@ export default function QuizGame({ quiz }) {
 					</div>
 				</div>
 			) : (
-				<div className='max-w-2xl mx-auto p-6'>
+				<div className='w-full'>
 					{/* Stats Bar */}
-					<div className='absolute top-0 left-0 right-0 bg-base-200 shadow-lg p-4 z-50'>
-						<div className='max-w-2xl mx-auto flex justify-between items-center'>
-							<div className='flex items-center gap-4'>
-								<span className='badge badge-lg'>
+					<div className='absolute top-0 left-0 right-0 bg-base-200 z-50 p-2 sm:p-3'>
+						<div className='max-w-2xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4'>
+							<div className='flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 w-full sm:w-auto'>
+								<span className='badge badge-lg text-xs sm:text-sm whitespace-nowrap'>
 									Question {state.currentQuestionIndex + 1} of{' '}
 									{state.questions.length}
 								</span>
-								<span className='badge badge-primary badge-lg'>
+								<span className='badge badge-primary badge-lg text-xs sm:text-sm whitespace-nowrap'>
 									{state.questions[state.currentQuestionIndex]?.type ===
 										'Single Choice' && 'Single choice'}
 									{state.questions[state.currentQuestionIndex]?.type ===
@@ -291,7 +353,7 @@ export default function QuizGame({ quiz }) {
 										'Fill in the Blank' && 'Fill in the Blank'}
 								</span>
 							</div>
-							<div className='flex items-center gap-4'>
+							<div className='flex items-center justify-center w-full sm:w-auto'>
 								<TimeCounter
 									time={state.timeLimit}
 									onTimeEnd={handleTimeEnd}
@@ -302,7 +364,9 @@ export default function QuizGame({ quiz }) {
 						</div>
 					</div>
 
-					<div className='mt-20'>{renderQuestion()}</div>
+					<div className='mt-20 w-full flex justify-center align-center'>
+						{renderQuestion()}
+					</div>
 				</div>
 			)}
 		</div>

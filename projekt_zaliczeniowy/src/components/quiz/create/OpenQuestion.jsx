@@ -41,57 +41,39 @@ export default function OpenQuestion({ onSubmit, defaultValues }) {
 			onSubmit={onSubmit}
 		>
 			{({ errors, touched }) => (
-				<Form className='space-y-6 w-full max-w-3xl mx-auto p-6'>
-					<div className='mb-6'>
+				<Form className='space-y-4 md:space-y-6 w-full max-w-3xl mx-auto p-3 sm:p-4 md:p-6'>
+					<div className='space-y-2'>
 						<Field
 							name='content'
 							as='textarea'
-							className='textarea textarea-bordered w-full h-10 bg-base-100'
+							className='textarea textarea-bordered w-full min-h-[60px] md:min-h-[80px] bg-base-100 text-sm md:text-base transition-all'
 							placeholder='Enter your question here...'
 						/>
 						{errors.content && touched.content && (
-							<div className='text-error text-sm mt-1'>{errors.content}</div>
+							<div className='text-error text-xs md:text-sm mt-1'>
+								{errors.content}
+							</div>
 						)}
 					</div>
 
-					<div className='mb-6'>
+					<div className='space-y-2'>
 						<Field
 							name='answers[0].content'
 							as='textarea'
-							className='textarea textarea-bordered w-full h-20 bg-base-100'
+							className='textarea textarea-bordered w-full min-h-[80px] md:min-h-[100px] bg-base-100 text-sm md:text-base transition-all'
 							placeholder='Enter the correct answer here...'
 						/>
 						{errors.answers?.[0]?.content && touched.answers?.[0]?.content && (
-							<div className='text-error text-sm mt-1'>
+							<div className='text-error text-xs md:text-sm mt-1'>
 								{errors.answers[0].content}
 							</div>
 						)}
 					</div>
 
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<div>
-							<Field
-								name='hint'
-								className='input input-bordered input-sm w-full bg-base-100'
-								placeholder='Hint (optional)'
-							/>
-						</div>
-						<div>
-							<Field
-								type='number'
-								name='timeLimit'
-								className='input input-bordered input-sm w-full bg-base-100'
-								placeholder='Time limit (seconds)'
-							/>
-							{errors.timeLimit && touched.timeLimit && (
-								<div className='text-error text-sm mt-1'>
-									{errors.timeLimit}
-								</div>
-							)}
-						</div>
-					</div>
-
-					<button type='submit' className='btn btn-primary w-full'>
+					<button
+						type='submit'
+						className='btn btn-primary w-full text-sm md:text-base mt-4 md:mt-6 transition-all hover:scale-[1.02]'
+					>
 						Save Question
 					</button>
 				</Form>

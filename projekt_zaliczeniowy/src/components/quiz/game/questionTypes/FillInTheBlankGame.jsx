@@ -43,8 +43,16 @@ export default function FillInTheBlankGame({
 		return parts.map((part, index) => {
 			if (part === '___' || (part.startsWith('[') && part.endsWith(']'))) {
 				const currentIndex = inputIndex++;
-				let inputClassName =
-					'input input-bordered text-sm mx-1 my-1 w-12 break-words p-0';
+				let inputClassName = `
+				input input-bordered 
+				text-xs sm:text-sm md:text-base 
+				mx-1 my-1 
+				min-w-[3rem] sm:min-w-[4rem] max-w-[150px]
+				p-0 sm:p-1
+				h-8 sm:h-10
+				break-words
+				overflow-hidden
+			`;
 
 				if (showingAnswer) {
 					const isAnswerCorrect =
@@ -82,18 +90,18 @@ export default function FillInTheBlankGame({
 	};
 
 	return (
-		<div className='flex flex-col gap-6 w-full  mx-auto p-4'>
+		<div className='flex flex-col gap-4 sm:gap-6 w-full max-w-4xl mx-auto p-2 sm:p-4'>
 			<div className='card bg-base-200'>
-				<div className='card-body'>
-					<div className='card-title text-sm mb-4 break-words'>
+				<div className='card-body p-3 sm:p-6'>
+					<div className='card-title text-xs sm:text-sm md:text-base mb-2 sm:mb-4 whitespace-pre-wrap break-words leading-relaxed flex-wrap'>
 						{renderQuestionContent()}
 					</div>
 
-					<form onSubmit={handleSubmit} className='space-y-4'>
+					<form onSubmit={handleSubmit} className='space-y-2 sm:space-y-4'>
 						<div className='card-actions justify-end'>
 							<button
 								type='submit'
-								className='btn btn-primary'
+								className='btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm'
 								disabled={showingAnswer}
 							>
 								Submit Answer
@@ -102,25 +110,6 @@ export default function FillInTheBlankGame({
 					</form>
 				</div>
 			</div>
-
-			{question.hint && (
-				<div className='alert alert-info'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						fill='none'
-						viewBox='0 0 24 24'
-						className='stroke-current shrink-0 w-6 h-6'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth='2'
-							d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-						></path>
-					</svg>
-					<span>Hint: {question.hint}</span>
-				</div>
-			)}
 		</div>
 	);
 }
