@@ -130,6 +130,30 @@ export default function QuizGame({ quiz, onFinish }) {
 			});
 		}, 1000);
 	};
+	const handleDownloadResults = () => {
+		if (!state.statistics) return;
+
+		const results = {
+			quizName: quiz.name,
+			timestamp: state.statistics.timestamp,
+			score: state.statistics.score,
+			correctAnswersCount: state.statistics.correctAnswersCount,
+			correctAnswersPercentage: state.statistics.correctAnswersPercentage,
+			totalQuestions: state.questions.length,
+		};
+
+		const blob = new Blob([JSON.stringify(results, null, 2)], {
+			type: 'application/json',
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `quiz-results-${new Date().toISOString().split('T')[0]}.json`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	};
 
 	const handleAnswer = (answer) => {
 		dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: false });
@@ -295,6 +319,9 @@ export default function QuizGame({ quiz, onFinish }) {
 						onClick={() => window.location.reload()}
 					>
 						Try Again
+					</button>
+					<button className='btn btn-secondary' onClick={handleDownloadResults}>
+						Download Results
 					</button>
 					<Link href='/quizzes' className='btn btn-outline'>
 						Back to all quizzes

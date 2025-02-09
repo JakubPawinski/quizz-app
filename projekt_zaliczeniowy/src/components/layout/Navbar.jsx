@@ -86,6 +86,12 @@ export default function Navbar() {
 							{user ? (
 								<div className='flex items-center space-x-4'>
 									<Link
+										href={APP_ROUTES.LEADERBOARD}
+										className='btn btn-outline btn-primary'
+									>
+										Leaderboard
+									</Link>
+									<Link
 										href={APP_ROUTES.QUIZZES.LIST}
 										className='btn btn-outline btn-primary'
 									>
@@ -157,6 +163,13 @@ export default function Navbar() {
 				<div className='mt-16 flex flex-col space-y-4'>
 					{user ? (
 						<>
+							<Link
+								href={APP_ROUTES.LEADERBOARD}
+								className='btn btn-outline btn-primary w-full'
+								onClick={() => setIsDrawerOpen(false)}
+							>
+								Leaderboard
+							</Link>
 							<Link
 								href={APP_ROUTES.QUIZZES.LIST}
 								className='btn btn-outline btn-primary w-full'

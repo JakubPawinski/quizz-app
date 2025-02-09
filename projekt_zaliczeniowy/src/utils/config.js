@@ -27,6 +27,7 @@ const APP_ROUTES = {
 		PROFILE: (userId) => `/user/${userId}`,
 		QUIZ_EDIT: (userId, quizId) => `/user/${userId}/my-quizzes/${quizId}`,
 	},
+	LEADERBOARD: '/leaderboard',
 };
 
 export { ENDPOINTS, APP_ROUTES };
