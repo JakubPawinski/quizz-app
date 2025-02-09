@@ -40,6 +40,9 @@ export default function QuizCard({ quiz }) {
 				<h2 className='card-title text-xl font-bold mb-2'>{quiz.name}</h2>
 
 				<div className='flex items-center gap-2 mb-4'>
+					<span className='px-2 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800'>
+						{quiz.category.name}
+					</span>
 					<span
 						className={`px-2 py-1 rounded-full text-sm font-medium ${getDifficultyColor(
 							quiz.difficulty
