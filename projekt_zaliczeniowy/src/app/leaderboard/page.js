@@ -50,9 +50,9 @@ export default function LeaderboardPage() {
 							<tr className='bg-primary text-primary-content'>
 								<th className='text-lg'>Rank</th>
 								<th className='text-lg'>Player</th>
-								<th className='text-lg text-center'>Completed Quizzes</th>
-								<th className='text-lg text-center'>Average Score</th>
-								<th className='text-lg text-center'>Correct Answers</th>
+								<th className='text-lg text-center'>Avg. correct answers %</th>
+								<th className='text-lg text-center'>Quizzes played</th>
+								<th className='text-lg text-center'>Avg. score</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -74,16 +74,15 @@ export default function LeaderboardPage() {
 										</div>
 									</td>
 									<td className='font-semibold'>{player.nickname}</td>
-									<td className='text-center'>{player.stats.totalQuizzes}</td>
 									<td className='text-center'>
-										{player.stats.averageScore.toFixed(1)} pts
-									</td>
-									<td className='text-center'>
-										{player.stats.totalCorrectAnswers}
 										<span className='text-sm text-gray-500 ml-1'>
 											({player.stats.averageCorrectAnswersPercentage.toFixed(1)}
 											%)
 										</span>
+									</td>
+									<td className='text-center'>{player.stats.totalQuizzes}</td>
+									<td className='text-center'>
+										{player.stats.averageScore.toFixed(1)} pts
 									</td>
 								</tr>
 							))}

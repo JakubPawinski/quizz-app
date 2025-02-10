@@ -45,7 +45,7 @@ export default function GoogleCallback() {
 			}
 		};
 		handleAuth();
-	}, [router]);
+	}, [router, setIsLoading, setUser, showNotification]);
 
 	return (
 		<div className='min-h-screen flex items-center justify-center flex-col'>
