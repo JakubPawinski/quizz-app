@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
 	useEffect(() => {
 		const checkAuth = async () => {
 			const token = Cookies.get('auth_token');
-			console.log('token:', token);
+			// console.log('token:', token);
 			if (!token) {
 				setUser(null);
 				setIsLoaded(true);

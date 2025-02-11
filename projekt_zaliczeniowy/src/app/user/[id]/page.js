@@ -8,7 +8,6 @@ import { useNotification } from '@/providers/NotificationProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Image from 'next/image';
 
 const validationSchema = Yup.object({
 	firstName: Yup.string().required('First Name is required'),
@@ -40,7 +39,7 @@ export default function UserPage() {
 						withCredentials: true,
 					}
 				);
-				console.log('response:', response.data);
+				// console.log('response:', response.data);
 				setAchievemnts(response.data);
 			} catch (error) {
 				console.error('Error fetching user:', error);
@@ -70,7 +69,7 @@ export default function UserPage() {
 			const response = await axios.patch(`${ENDPOINTS.USER}/${id}`, values, {
 				withCredentials: true,
 			});
-			console.log('response:', response);
+			// console.log('response:', response);
 			setUser(response.data);
 			showNotification('Profile updated successfully', 'success');
 			setIsEditing(false);

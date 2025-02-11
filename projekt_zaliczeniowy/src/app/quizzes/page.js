@@ -13,7 +13,7 @@ export default function QuizzesPage() {
 		const fetchAllQuizzes = async () => {
 			const response = await axios.get(`${ENDPOINTS.QUIZ}/all`);
 			setQuizzes(response.data.data);
-			console.log(response.data.data);
+			// console.log(response.data.data);
 		};
 		fetchAllQuizzes();
 	}, []);
