@@ -28,6 +28,11 @@ const APP_ROUTES = {
 		QUIZ_EDIT: (userId, quizId) => `/user/${userId}/my-quizzes/${quizId}`,
 	},
 	LEADERBOARD: '/leaderboard',
+	ADMIN: {
+		USERS: '/admin/users',
+		QUIZZES: '/admin/quizzes',
+		QUIZ_EDIT: (quizId) => `/admin/quizzes/${quizId}`,
+	},
 };
 
 export { ENDPOINTS, APP_ROUTES };

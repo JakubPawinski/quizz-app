@@ -28,7 +28,8 @@ export default function Comment({ comment, onDelete, quizId }) {
 				<div className='text-xs text-base-content/70'>
 					{new Date(comment.timestamp).toLocaleDateString()}
 				</div>
-				{user && user._id === comment.userId._id && (
+
+				{user && (user._id === comment.userId._id || user.rootAccess) && (
 					<button
 						onClick={handleDelete}
 						disabled={isDeleting}

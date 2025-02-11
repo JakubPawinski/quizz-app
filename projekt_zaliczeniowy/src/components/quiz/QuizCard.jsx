@@ -3,11 +3,15 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { APP_ROUTES } from '@/utils/config';
 import { useAuth } from '@/providers/AuthProvider';
+import axios from 'axios';
+import { ENDPOINTS } from '@/utils/config';
+import { useNotification } from '@/providers/NotificationProvider';
 
 export default function QuizCard({ quiz }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { user } = useAuth();
+	const { showNotification } = useNotification();
 	const getDifficultyColor = (difficulty) => {
 		switch (difficulty) {
 			case 'Easy':
@@ -22,20 +26,50 @@ export default function QuizCard({ quiz }) {
 	};
 
 	const handleClick = () => {
-		console.log('Handle click');
-		console.log('quiz:', quiz);
-		console.log('router:', pathname);
+		// console.log('Handle click');
+		// console.log('quiz:', quiz);
+		// console.log('router:', pathname);
 
 		if (pathname.includes('user')) {
+			// console.log('User quiz');
 			router.push(`${APP_ROUTES.USER.QUIZ_EDIT(user._id, quiz._id)}`);
+		} else if (pathname.includes('admin')) {
+			// console.log('Admin quiz');
+			router.push(`${APP_ROUTES.ADMIN.QUIZ_EDIT(quiz._id)}`);
 		} else {
 			router.push(`${APP_ROUTES.QUIZZES.QUIZ(quiz._id)}`);
 			// console.log(`${APP_ROUTES.QUIZZES.QUIZ(quiz._id)}`);
 		}
 	};
 
+	const handleDelete = async () => {
+		console.log('Delete quiz');
+		try {
+			const response = await axios.delete(`${ENDPOINTS.QUIZ}/${quiz._id}`, {
+				withCredentials: true,
+			});
+			console.log('response:', response.data);
+			showNotification('Quiz deleted successfully', 'success');
+			dispatchEvent(new Event('refreshQuizzes'));
+		} catch (error) {
+			console.error(error);
+			showNotification(
+				error.response.data.message || 'An occure error',
+				'error'
+			);
+		}
+	};
+
 	return (
 		<div className='card bg-base-100 w-96 shadow-xl hover:shadow-2xl transition-shadow'>
+			{user?.rootAccess && (
+				<button
+					onClick={handleDelete}
+					className='absolute top-2 right-2 btn btn-error btn-xs btn-outline'
+				>
+					Delete
+				</button>
+			)}
 			<div className='card-body'>
 				<h2 className='card-title text-xl font-bold mb-2'>{quiz.name}</h2>
 

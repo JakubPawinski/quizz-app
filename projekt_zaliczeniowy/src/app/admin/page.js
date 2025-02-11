@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { APP_ROUTES, ENDPOINTS } from '@/utils/config';
 import Link from 'next/link';
 import { useChart } from '@/hooks/useChart';
 import Stat from '@/components/admin/Stat';
@@ -285,11 +285,17 @@ export default function AdminPage() {
 
 				<div className='divider divider-accent text-xl'>Navigation</div>
 
-				<div className='flex flex-wrap gap-4 mb-12'>
-					<Link href='/admin/users' className='btn btn-primary'>
+				<div className='flex flex-wrap gap-6 mb-12 justify-center'>
+					<Link
+						href={`${APP_ROUTES.ADMIN.USERS}`}
+						className='btn btn-primary btn-lg shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1'
+					>
 						Manage Users
 					</Link>
-					<Link href='/admin/quizzes' className='btn btn-secondary'>
+					<Link
+						href={`${APP_ROUTES.ADMIN.QUIZZES}`}
+						className='btn btn-secondary btn-lg shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1'
+					>
 						Manage Quizzes
 					</Link>
 				</div>
