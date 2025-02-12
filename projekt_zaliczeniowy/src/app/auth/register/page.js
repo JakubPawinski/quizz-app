@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useRouter } from 'next/navigation';
 import SignInGoogle from '@/components/auth/SignInGoogle';
@@ -34,7 +34,7 @@ const RegisterSchema = Yup.object().shape({
 
 export default function Register() {
 	const router = useRouter();
-	const { setUser } = useAuth();
+	const { setUser } = useUser();
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
 

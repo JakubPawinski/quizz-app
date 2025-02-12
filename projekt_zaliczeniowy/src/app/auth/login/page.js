@@ -1,25 +1,61 @@
 'use client';
 import Link from 'next/link';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/providers/LoadingProvider';
 import SignInGoogle from '@/components/auth/SignInGoogle';
 import { useNotification } from '@/providers/NotificationProvider';
+import { useState } from 'react';
 
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Required'),
 	password: Yup.string().required('Required'),
 });
 
+const TempPasswordSchema = Yup.object().shape({
+	email: Yup.string().email('Invalid email').required('Required'),
+});
+
 export default function Login() {
 	const router = useRouter();
-	const { setUser } = useAuth();
+	const { setUser } = useUser();
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
+
+	const [showTempPasswordForm, setShowTempPasswordForm] = useState(false);
+
+	const handleTempPassword = async (values) => {
+		if (!values.email) {
+			setShowTempPasswordForm((prev) => !prev);
+			return;
+		}
+
+		setIsLoading(true);
+		try {
+			const response = await axios.post(
+				`${ENDPOINTS.AUTH}/temp-password`,
+				values,
+				{
+					withCredentials: true,
+				}
+			);
+			// console.log(response);
+			showNotification(response.data.message, 'success');
+			setShowTempPasswordForm(false);
+		} catch (error) {
+			console.error(error);
+			showNotification(
+				error.response?.data?.message || 'An error occurred',
+				'error'
+			);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
@@ -30,15 +66,9 @@ export default function Login() {
 				withCredentials: true,
 			});
 			if (response.data?.message) {
-				// console.log('Show notification:', response.data.message);
-				// console.log(response.data.message);
 				showNotification(response.data.message, 'success');
 			}
 			console.log(response);
-
-			// console.log('Document cookies:', document.cookie);
-			// console.log('Headers:', response.headers);
-			// console.log('Set-Cookie:', response.headers['set-cookie']);
 
 			setUser(response.data.userData);
 			router.push('/quizzes');
@@ -117,6 +147,47 @@ export default function Login() {
 				</div>
 			</div>
 			<div>
+				{!showTempPasswordForm ? (
+					<button
+						href='/auth/verify-email'
+						className='block text-sm text-primary hover:text-primary-focus text-center mt-2 hover:underline mx-auto'
+						onClick={handleTempPassword}
+					>
+						Send one-time password to your email
+					</button>
+				) : (
+					<div className='flex justify-center'>
+						<div className='auth-form'>
+							<h2 className='text-xl font-bold mb-4'>
+								Request Temporary Password
+							</h2>
+							<Formik
+								initialValues={{ email: '' }}
+								validationSchema={TempPasswordSchema}
+								onSubmit={handleTempPassword}
+							>
+								<Form className='space-y-4'>
+									<div>
+										<Field
+											name='email'
+											type='email'
+											placeholder='Email'
+											className='input input-bordered'
+										/>
+										<ErrorMessage
+											name='email'
+											component='div'
+											className='text-error text-sm mt-1'
+										/>
+									</div>
+									<button type='submit' className='btn btn-primary'>
+										Send Temporary Password
+									</button>
+								</Form>
+							</Formik>
+						</div>
+					</div>
+				)}
 				<Link
 					href='/auth/verify-email'
 					className='block text-sm text-primary hover:text-primary-focus text-center mt-2 hover:underline'

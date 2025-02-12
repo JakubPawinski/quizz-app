@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import useElimination from '@/hooks/useElimination';
 
 export default function SingleChoiceGame({
 	question,
@@ -7,17 +8,25 @@ export default function SingleChoiceGame({
 	showingAnswer,
 }) {
 	const [selectedAnswer, setSelectedAnswer] = useState(null);
+	const { handleEliminateOne, eliminatedAnswers } = useElimination();
+
+	const handleEliminate = () => {
+		setSelectedAnswer([]);
+		handleEliminateOne(question.answers);
+	};
 
 	const getOptionClassName = (option) => {
+		const eliminatedStyle = eliminatedAnswers.includes(option)
+			? 'opacity-50 line-through cursor-not-allowed'
+			: '';
 		if (!showingAnswer) {
-			return `flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all 
+			return `flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all ${eliminatedStyle}
                 ${
 									selectedAnswer === option
 										? 'bg-primary/20 border-primary'
 										: 'bg-base-100 hover:bg-base-300'
 								} border-2`;
 		}
-		// Pokazuj kolor tylko dla zaznaczonej odpowiedzi
 		if (selectedAnswer === option) {
 			return `flex items-center gap-3 p-4 rounded-lg border-2 
                 ${
@@ -50,7 +59,14 @@ export default function SingleChoiceGame({
 										type='radio'
 										className='radio radio-primary'
 										checked={selectedAnswer === option}
-										onChange={() => !showingAnswer && setSelectedAnswer(option)}
+										onChange={() => {
+											if (
+												!showingAnswer &&
+												!eliminatedAnswers.includes(option)
+											) {
+												setSelectedAnswer(option);
+											}
+										}}
 										disabled={showingAnswer}
 									/>
 									<span className='text-lg'>{option.content}</span>
@@ -68,6 +84,14 @@ export default function SingleChoiceGame({
 						</div>
 
 						<div className='card-actions justify-end mt-6'>
+							<button
+								type='button'
+								className='btn btn-warning'
+								onClick={handleEliminate}
+								disabled={eliminatedAnswers.length > 0 || showingAnswer}
+							>
+								Eliminate one answer
+							</button>
 							<button
 								type='submit'
 								className='btn btn-primary'

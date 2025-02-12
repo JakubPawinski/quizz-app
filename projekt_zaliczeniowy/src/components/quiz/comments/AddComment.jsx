@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 
 export default function AddComment({ quizId, onCommentAdded }) {
-	const { user } = useAuth();
+	const { user } = useUser();
 	const [content, setContent] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showForm, setShowForm] = useState(false);

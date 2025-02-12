@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import { APP_ROUTES } from '@/utils/config';
 import QuizEditForm from '@/components/quiz/QuizEditForm';
 import axios from 'axios';

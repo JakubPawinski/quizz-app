@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useChart } from '@/hooks/useChart';
 import Stat from '@/components/admin/Stat';
 import { useLoading } from '@/providers/LoadingProvider';
+import AddQuizCategory from '@/components/admin/AddQuizCategory';
+import ManageCategories from '@/components/admin/ManageCategories';
 
 export default function AdminPage() {
 	const [stats, setStats] = useState({});
@@ -366,6 +368,10 @@ export default function AdminPage() {
 				</div>
 
 				<div className='divider divider-accent text-xl'>Actions</div>
+				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+					<AddQuizCategory />
+					<ManageCategories />
+				</div>
 			</div>
 		</div>
 	);

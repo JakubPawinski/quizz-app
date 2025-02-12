@@ -29,6 +29,7 @@ const APP_ROUTES = {
 	},
 	LEADERBOARD: '/leaderboard',
 	ADMIN: {
+		DASHBOARD: '/admin',
 		USERS: '/admin/users',
 		QUIZZES: '/admin/quizzes',
 		QUIZ_EDIT: (quizId) => `/admin/quizzes/${quizId}`,

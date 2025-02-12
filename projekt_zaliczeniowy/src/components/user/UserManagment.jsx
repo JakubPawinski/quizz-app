@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import { useNotification } from '@/providers/NotificationProvider';
 import { ENDPOINTS } from '@/utils/config';
 import { useLoading } from '@/providers/LoadingProvider';

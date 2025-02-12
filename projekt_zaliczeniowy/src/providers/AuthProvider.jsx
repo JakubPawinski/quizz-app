@@ -16,6 +16,10 @@ export function AuthProvider({ children }) {
 	useEffect(() => {
 		const checkAuth = async () => {
 			const token = Cookies.get('auth_token');
+
+			if (token) {
+				setUser(jwtDecode(token));
+			}
 			// console.log('token:', token);
 			if (!token) {
 				setUser(null);
@@ -45,9 +49,9 @@ export function AuthProvider({ children }) {
 	}, []);
 	return (
 		<AuthContext.Provider value={{ user, setUser, isLoaded }}>
-			{children}
+			{isLoaded && children}
 		</AuthContext.Provider>
 	);
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useUser = () => useContext(AuthContext);

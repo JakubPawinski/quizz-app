@@ -5,7 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import TimeCounter from './TimeCounter';
 import { ENDPOINTS } from '@/utils/config';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 
 import SingleChoiceGame from './questionTypes/SingleChoiceGame';
 import MultipleChoiceGame from './questionTypes/MultipleChoiceGame';
@@ -66,7 +66,7 @@ const shuffleArray = (array) => _.shuffle(array);
 
 export default function QuizGame({ quiz, onFinish }) {
 	const [state, dispatch] = useReducer(quizReducer, initialState);
-	const { user } = useAuth();
+	const { user } = useUser();
 
 	const currentQuestion = useMemo(
 		() => state.questions[state.currentQuestionIndex],
@@ -224,7 +224,7 @@ export default function QuizGame({ quiz, onFinish }) {
 			);
 			dispatch({ type: ACTIONS.SET_STATISTICS, payload: response.data.data });
 			onFinish();
-			// console.log('Quiz completed:', response.data.data);
+			console.log('Quiz completed:', response.data.data);
 		} catch (error) {
 			console.log(error);
 		}

@@ -8,7 +8,7 @@ import { useLoading } from '@/providers/LoadingProvider';
 import QuizEditForm from '@/components/quiz/QuizEditForm';
 import QuestionManager from '@/components/quiz/QuestionManager';
 import { useNotification } from '@/providers/NotificationProvider';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 const { useRouter } = require('next/navigation');
 
 export default function QuizEditPage() {
@@ -18,7 +18,7 @@ export default function QuizEditPage() {
 	const { setIsLoading } = useLoading();
 	const [categories, setCategories] = useState([]);
 	const { showNotification } = useNotification();
-	const { user } = useAuth();
+	const { user } = useUser();
 	const router = useRouter();
 
 	useEffect(() => {

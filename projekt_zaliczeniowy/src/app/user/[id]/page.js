@@ -5,12 +5,12 @@ import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useNotification } from '@/providers/NotificationProvider';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import UserManagment from '@/components/user/UserManagment';
 
 export default function UserPage() {
 	const { id } = useParams();
-	const { user } = useAuth();
+	const { user } = useUser();
 	const { setIsLoading } = useLoading();
 	const [achievements, setAchievemnts] = useState([]);
 

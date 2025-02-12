@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import useElimination from '@/hooks/useElimination';
+
 export default function MultipleChoiceGame({
 	question,
 	onAnswer,
@@ -7,10 +9,19 @@ export default function MultipleChoiceGame({
 	showingAnswer,
 }) {
 	const [selectedAnswers, setSelectedAnswers] = useState([]);
+	const { handleEliminateOne, eliminatedAnswers } = useElimination();
+
+	const handleEliminate = () => {
+		setSelectedAnswers([]);
+		handleEliminateOne(question.answers);
+	};
 
 	const getOptionClassName = (option) => {
+		const eliminatedStyle = eliminatedAnswers.includes(option)
+			? 'opacity-50 line-through cursor-not-allowed'
+			: '';
 		if (!showingAnswer) {
-			return `flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all 
+			return `flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all ${eliminatedStyle}
                 ${
 									selectedAnswers.includes(option)
 										? 'bg-primary/20 border-primary'
@@ -29,6 +40,7 @@ export default function MultipleChoiceGame({
 	};
 
 	const handleOptionClick = (option) => {
+		if (eliminatedAnswers.includes(option)) return;
 		if (!showingAnswer) {
 			if (selectedAnswers.includes(option)) {
 				setSelectedAnswers(selectedAnswers.filter((ans) => ans !== option));
@@ -77,6 +89,14 @@ export default function MultipleChoiceGame({
 						</div>
 
 						<div className='card-actions justify-end mt-6'>
+							<button
+								type='button'
+								className='btn btn-warning'
+								onClick={handleEliminate}
+								disabled={eliminatedAnswers.length > 0 || showingAnswer}
+							>
+								Eliminate one answer
+							</button>
 							<button
 								type='submit'
 								className='btn btn-primary'

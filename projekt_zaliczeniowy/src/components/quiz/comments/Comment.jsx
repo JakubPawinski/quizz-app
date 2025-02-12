@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ENDPOINTS } from '@/utils/config';
 import axios from 'axios';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 
 export default function Comment({ comment, onDelete, quizId }) {
-	const { user } = useAuth();
+	const { user } = useUser();
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	const handleDelete = async () => {

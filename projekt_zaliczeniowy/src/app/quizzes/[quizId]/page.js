@@ -7,7 +7,7 @@ import { useLoading } from '@/providers/LoadingProvider';
 import QuizGame from '@/components/quiz/game/QuizGame';
 import Comment from '@/components/quiz/comments/comment';
 import AddComment from '@/components/quiz/comments/AddComment';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 
 export default function QuizPage() {
 	const [isStarted, setIsStarted] = useState(false);
@@ -16,7 +16,7 @@ export default function QuizPage() {
 	const { quizId } = useParams();
 	const { setIsLoading } = useLoading();
 	const [refreshRank, setRefreshRank] = useState(false);
-	const { user } = useAuth();
+	const { user } = useUser();
 
 	const handleCommentDelete = (commentId) => {
 		setQuiz((prevQuiz) => ({
@@ -51,7 +51,7 @@ export default function QuizPage() {
 		const fetchQuizRanking = async () => {
 			try {
 				const response = await axios.get(`${ENDPOINTS.RANKING}/${quizId}/3`);
-				// console.log('ranking:', response.data.data);
+				console.log('ranking:', response.data.data);
 				const ranking = response.data.data ? response.data.data : [];
 				setQuizRanking(ranking);
 			} catch (error) {

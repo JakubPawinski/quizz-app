@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { APP_ROUTES } from '@/utils/config';
 import QuizList from '@/components/quiz/QuizList';
 import { useLoading } from '@/providers/LoadingProvider';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 
 export default function UserQuizzesPage() {
-	const { user, isLoaded } = useAuth();
+	const { user, isLoaded } = useUser();
 	const [quizzes, setQuizzes] = useState([]);
 	const { setIsLoading } = useLoading();
 	const router = useRouter();

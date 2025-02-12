@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { APP_ROUTES } from '@/utils/config';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 import { useNotification } from '@/providers/NotificationProvider';
@@ -10,7 +10,7 @@ import { useNotification } from '@/providers/NotificationProvider';
 export default function QuizCard({ quiz }) {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { user } = useAuth();
+	const { user } = useUser();
 	const { showNotification } = useNotification();
 	const getDifficultyColor = (difficulty) => {
 		switch (difficulty) {

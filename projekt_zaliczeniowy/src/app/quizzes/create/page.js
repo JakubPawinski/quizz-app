@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 
 const QuizSchema = Yup.object().shape({
 	name: Yup.string()
@@ -23,7 +23,7 @@ export default function CreateQuizPage() {
 	const [categories, setCategories] = useState([]);
 	const { showNotification } = useNotification();
 	const { setIsLoading } = useLoading();
-	const { user } = useAuth();
+	const { user } = useUser();
 	const router = useRouter();
 
 	useEffect(() => {

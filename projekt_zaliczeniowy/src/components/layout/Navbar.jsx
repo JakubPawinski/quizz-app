@@ -2,16 +2,18 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUser } from '@/providers/AuthProvider';
 import axios from 'axios';
 import { ENDPOINTS } from '@/utils/config';
 import { useLayoutEffect, useState } from 'react';
 import { useNotification } from '@/providers/NotificationProvider';
 import { APP_ROUTES } from '@/utils/config';
+import { useRouter } from 'next/navigation';
 export default function Navbar() {
-	const { user, setUser } = useAuth();
+	const { user, setUser } = useUser();
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const { showNotification } = useNotification();
+	const router = useRouter();
 
 	const [windowWidth, setWindowWidth] = useState(0);
 	useLayoutEffect(() => {
@@ -26,13 +28,14 @@ export default function Navbar() {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	const isMobile = windowWidth < 770;
+	const isMobile = windowWidth < 920;
 
 	const handleLogout = async () => {
 		try {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/logout`, null, {
 				withCredentials: true,
 			});
+			router.push(APP_ROUTES.HOME);
 			setUser(null);
 			showNotification(response.data.message, 'success');
 			console.log('User logged out');
@@ -85,6 +88,14 @@ export default function Navbar() {
 						<>
 							{user ? (
 								<div className='flex items-center space-x-4'>
+									{user.rootAccess && (
+										<Link
+											href={APP_ROUTES.ADMIN.DASHBOARD}
+											className='btn btn-outline btn-primary'
+										>
+											Admin Dashboard
+										</Link>
+									)}
 									<Link
 										href={APP_ROUTES.LEADERBOARD}
 										className='btn btn-outline btn-primary'
@@ -163,6 +174,14 @@ export default function Navbar() {
 				<div className='mt-16 flex flex-col space-y-4'>
 					{user ? (
 						<>
+							{user.rootAccess && (
+								<Link
+									href={APP_ROUTES.ADMIN.DASHBOARD}
+									className='btn btn-outline btn-primary'
+								>
+									Admin Dashboard
+								</Link>
+							)}
 							<Link
 								href={APP_ROUTES.LEADERBOARD}
 								className='btn btn-outline btn-primary w-full'
