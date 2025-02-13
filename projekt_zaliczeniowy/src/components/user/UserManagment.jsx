@@ -27,24 +27,20 @@ export default function UserManagment({ userData, isRoot = false }) {
 	const { setIsLoading } = useLoading();
 
 	//Initial values for the form
-	const initialValues = useMemo(
-		() => ({
-			firstName: user?.firstName || '',
-			lastName: user?.lastName || '',
-			email: user?.email || '',
-			nickname: user?.nickname || '',
-			privacy: user?.privacy,
-			wantNotifications: user?.wantNotifications,
-		}),
-		[user]
-	);
+	const initialValues = {
+		firstName: user?.firstName || '',
+		lastName: user?.lastName || '',
+		email: user?.email || '',
+		nickname: user?.nickname || '',
+		privacy: user?.privacy,
+		wantNotifications: user?.wantNotifications,
+	};
 
 	//Update user data when it changes
 	useEffect(() => {
 		// console.log('userData:', userData);
 		setUser(userData);
 	}, [userData]);
-
 
 	//Function to handle the submit of the form
 	const handleSubmit = async (values, { setSubmitting }) => {
@@ -74,7 +70,6 @@ export default function UserManagment({ userData, isRoot = false }) {
 			setSubmitting(false);
 		}
 	};
-
 
 	//Function to handle the delete of the user
 	const handleDelete = async () => {

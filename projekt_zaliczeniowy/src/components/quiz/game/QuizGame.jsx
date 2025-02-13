@@ -29,7 +29,7 @@ const ACTIONS = {
 	SET_STATISTICS: 'set_statistics',
 	SET_SHOWING_ANSWER: 'set_showing_answer',
 };
-const initialState = {
+const INITIAL_STATE = {
 	questions: [],
 	isGameActive: false,
 	currentQuestionIndex: 0,
@@ -68,7 +68,7 @@ function quizReducer(state, action) {
 const shuffleArray = (array) => _.shuffle(array);
 
 export default function QuizGame({ quiz, onFinish }) {
-	const [state, dispatch] = useReducer(quizReducer, initialState);
+	const [state, dispatch] = useReducer(quizReducer, INITIAL_STATE);
 
 	// Context
 	const { user } = useUser();
