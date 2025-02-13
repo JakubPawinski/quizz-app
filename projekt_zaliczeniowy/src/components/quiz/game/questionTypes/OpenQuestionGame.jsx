@@ -10,11 +10,7 @@ export default function OpenQuestionGame({
 	const [submittedAnswer, setSubmittedAnswer] = useState('');
 	const [isCorrect, setIsCorrect] = useState(null);
 
-	// useEffect(() => {
-	// 	// console.log(showingAnswer);
-	// 	return () => {};
-	// }, [showingAnswer]);
-
+	// Function to handle form submission
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (answer.trim()) {

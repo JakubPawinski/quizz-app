@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useUser } from '@/providers/AuthProvider';
+import Link from 'next/link';
 
 export default function AddComment({ quizId, onCommentAdded }) {
-	const { user } = useUser();
 	const [content, setContent] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showForm, setShowForm] = useState(false);
 
+	//Context
+	const { user } = useUser();
+
+	//Function to handle form submit
 	const handleSubmit = async (e) => {
-		console.log('handleSubmit');
+		// console.log('handleSubmit');
 		e.preventDefault();
 		if (!content.trim()) return;
 
@@ -42,11 +46,7 @@ export default function AddComment({ quizId, onCommentAdded }) {
 	if (!user) {
 		return (
 			<div className='text-center text-sm text-base-content/70 p-4'>
-				Please{' '}
-				<a href='/login' className='text-primary hover:underline'>
-					log in
-				</a>{' '}
-				to add a comment.
+				Please <Link href='/login'>Log in </Link> to add a comment.
 			</div>
 		);
 	}

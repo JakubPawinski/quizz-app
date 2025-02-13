@@ -1,26 +1,31 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import { ENDPOINTS, APP_ROUTES } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import QuizEditForm from '@/components/quiz/QuizEditForm';
 import QuestionManager from '@/components/quiz/QuestionManager';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useUser } from '@/providers/AuthProvider';
-const { useRouter } = require('next/navigation');
+import { useRouter } from 'next/navigation';
+import useEventListener from '@/hooks/useEventListener';
 
 export default function QuizEditPage() {
 	const params = useParams();
-	const { quizId } = params;
-	const [quiz, setQuiz] = useState(null);
-	const { setIsLoading } = useLoading();
-	const [categories, setCategories] = useState([]);
-	const { showNotification } = useNotification();
-	const { user } = useUser();
 	const router = useRouter();
+	const [quiz, setQuiz] = useState(null);
+	const [categories, setCategories] = useState([]);
 
+	//Context
+	const { showNotification } = useNotification();
+	const { setIsLoading } = useLoading();
+	const { user } = useUser();
+
+	const { quizId } = params;
+
+	//UseEffect to fetch categories data
 	useEffect(() => {
 		const fetchCategories = async () => {
 			const response = await axios.get(`${ENDPOINTS.QUIZ}/categories`);
@@ -30,37 +35,33 @@ export default function QuizEditPage() {
 		fetchCategories();
 	}, []);
 
-	useEffect(() => {
-		const fetchQuiz = async () => {
-			setIsLoading(true);
-			try {
-				const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
-				// console.log('response:', response.data.data);
+	//Function to fetch quiz data
+	const fetchQuiz = useCallback(async () => {
+		// console.log("fetchQuiz");
+		setIsLoading(true);
+		try {
+			const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
+			console.log('response:', response.data.data);
 
-				setQuiz(response.data.data);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		window.addEventListener('refreshQuiz', fetchQuiz);
-		fetchQuiz();
-
-		return () => {
-			window.removeEventListener('refreshQuiz', fetchQuiz);
-		};
+			setQuiz(response.data.data);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
 	}, [quizId, setIsLoading]);
 
+	//UseEffect to fetch quiz data
 	useEffect(() => {
-		if (!quiz) return;
-		return () => {};
-	}, [quiz]);
+		fetchQuiz();
+	}, [quizId]);
 
+	//Event listener to refresh quiz data
+	useEventListener('refreshQuiz', fetchQuiz);
+
+	//Function to handle form submission
 	const handleSubmit = async (values) => {
 		// console.log('values:', values);
-
 		try {
 			const response = await axios.patch(
 				`${ENDPOINTS.QUIZ}/${quizId}`,
@@ -77,8 +78,9 @@ export default function QuizEditPage() {
 		}
 	};
 
+	//Function to handle quiz deletion
 	const handleDelete = async () => {
-		console.log('Delete quiz');
+		// console.log('Delete quiz');
 		try {
 			const response = await axios.delete(`${ENDPOINTS.QUIZ}/${quizId}`, {
 				withCredentials: true,
@@ -95,8 +97,9 @@ export default function QuizEditPage() {
 		}
 	};
 
+	//Function to add new question
 	const onNewQuestion = () => {
-		console.log('Add new question');
+		// console.log('Add new question');
 		// console.log('quiz:', quiz);
 		setQuiz({
 			...quiz,
@@ -111,6 +114,7 @@ export default function QuizEditPage() {
 		});
 	};
 
+	//Loading state
 	if (!quiz) {
 		return (
 			<div className='min-h-screen flex items-center justify-center'>

@@ -3,7 +3,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 

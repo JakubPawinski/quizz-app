@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { useUser } from '@/providers/AuthProvider';
 import { useNotification } from '@/providers/NotificationProvider';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
 
 const validationSchema = Yup.object({
@@ -21,9 +21,12 @@ const validationSchema = Yup.object({
 export default function UserManagment({ userData, isRoot = false }) {
 	const [user, setUser] = useState(userData);
 	const [isEditing, setIsEditing] = useState(false);
+
+	//Context
 	const { showNotification } = useNotification();
 	const { setIsLoading } = useLoading();
 
+	//Initial values for the form
 	const initialValues = useMemo(
 		() => ({
 			firstName: user?.firstName || '',
@@ -35,11 +38,15 @@ export default function UserManagment({ userData, isRoot = false }) {
 		}),
 		[user]
 	);
+
+	//Update user data when it changes
 	useEffect(() => {
 		// console.log('userData:', userData);
 		setUser(userData);
 	}, [userData]);
 
+
+	//Function to handle the submit of the form
 	const handleSubmit = async (values, { setSubmitting }) => {
 		setIsLoading(true);
 		// console.log('values:', values);
@@ -68,6 +75,8 @@ export default function UserManagment({ userData, isRoot = false }) {
 		}
 	};
 
+
+	//Function to handle the delete of the user
 	const handleDelete = async () => {
 		setIsLoading(true);
 		try {

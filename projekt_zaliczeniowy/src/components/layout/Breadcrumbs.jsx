@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import _ from 'lodash';
 
 export default function Breadcrumbs() {
 	const pathname = usePathname();
@@ -15,8 +16,7 @@ export default function Breadcrumbs() {
 				</li>
 				{pathSegments.map((segment, index) => {
 					const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
-					const formattedSegment =
-						segment.charAt(0).toUpperCase() + segment.slice(1);
+					const formattedSegment = _.capitalize(segment);
 
 					return (
 						<li key={path}>

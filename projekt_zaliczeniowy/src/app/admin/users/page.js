@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import Link from 'next/link';
 
@@ -10,6 +10,7 @@ export default function AdminUsersPage() {
 	const [users, setUsers] = useState([]);
 	const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+	//UseEffect to fetch all users
 	useEffect(() => {
 		const fetchUsers = async () => {
 			setIsLoading(true);
@@ -29,6 +30,7 @@ export default function AdminUsersPage() {
 		fetchUsers();
 	}, []);
 
+	//Function to handle sorting
 	const handleSort = (key) => {
 		let direction = 'asc';
 		if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -36,6 +38,8 @@ export default function AdminUsersPage() {
 		}
 		setSortConfig({ key, direction });
 	};
+
+	//Function to sort users
 	const sortedUsers = useMemo(() => {
 		if (!sortConfig.key) return users;
 		const sorted = [...users].sort((a, b) => {

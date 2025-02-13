@@ -1,25 +1,30 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useUser } from '@/providers/AuthProvider';
-import { APP_ROUTES } from '@/utils/config';
+import { useCallback, useEffect, useState } from 'react';
+import { APP_ROUTES } from '@/config';
 import QuizEditForm from '@/components/quiz/QuizEditForm';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useLoading } from '@/providers/LoadingProvider';
 import QuestionManager from '@/components/quiz/QuestionManager';
 import { useParams } from 'next/navigation';
+import useEventListener from '@/hooks/useEventListener';
 
 export default function AdminQuizzesIdPage() {
+	//Defualt hooks
 	const { setIsLoading } = useLoading();
 	const { quizId } = useParams();
-	const [quiz, setQuiz] = useState(null);
-	const [categories, setCategories] = useState([]);
-	const { showNotification } = useNotification();
 	const router = useRouter();
 
+	const [quiz, setQuiz] = useState(null);
+	const [categories, setCategories] = useState([]);
+
+	//Context
+	const { showNotification } = useNotification();
+
+	//UseEffect to fetch  categories data
 	useEffect(() => {
 		const fetchCategories = async () => {
 			const response = await axios.get(`${ENDPOINTS.QUIZ}/categories`);
@@ -28,28 +33,31 @@ export default function AdminQuizzesIdPage() {
 		};
 		fetchCategories();
 	}, []);
-	useEffect(() => {
-		const fetchQuiz = async () => {
-			setIsLoading(true);
-			try {
-				const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
-				// console.log('response:', response.data.data);
 
-				setQuiz(response.data.data);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	//Function to fetch quiz data
+	const fetchQuiz = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
+			// console.log('response:', response.data.data);
 
-		window.addEventListener('refreshQuiz', fetchQuiz);
-		fetchQuiz();
-
-		return () => {
-			window.removeEventListener('refreshQuiz', fetchQuiz);
-		};
+			setQuiz(response.data.data);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
 	}, [quizId, setIsLoading]);
+
+	//Event listener to refresh quiz
+	useEventListener('refreshQuiz', fetchQuiz);
+
+	//UseEffect to fetch quiz data
+	useEffect(() => {
+		fetchQuiz();
+	}, [quizId, setIsLoading]);
+
+	//Submitting quiz data
 	const handleSubmit = async (values) => {
 		// console.log('values:', values);
 
@@ -69,6 +77,7 @@ export default function AdminQuizzesIdPage() {
 		}
 	};
 
+	//Deleting quiz
 	const handleDelete = async () => {
 		// console.log('Delete quiz');
 		try {
@@ -87,9 +96,11 @@ export default function AdminQuizzesIdPage() {
 		}
 	};
 
+	//If quiz is not available
 	if (!quiz) {
 		return null;
 	}
+
 	return (
 		<div className='min-h-screen p-8'>
 			<div className='max-w-4xl mx-auto'>

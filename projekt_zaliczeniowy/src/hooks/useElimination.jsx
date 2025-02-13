@@ -12,10 +12,5 @@ export default function useElimination() {
 			wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
 		setEliminatedAnswers([...eliminatedAnswers, toEliminate]);
 	};
-
-	const resetElimination = () => {
-		setEliminatedAnswers([]);
-	};
-
-	return { eliminatedAnswers, handleEliminateOne, resetElimination };
+	return { eliminatedAnswers, handleEliminateOne };
 }

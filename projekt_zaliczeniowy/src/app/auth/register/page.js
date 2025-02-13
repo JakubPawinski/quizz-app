@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/config';
 import { useUser } from '@/providers/AuthProvider';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useRouter } from 'next/navigation';
 import SignInGoogle from '@/components/auth/SignInGoogle';
 import { useNotification } from '@/providers/NotificationProvider';
+import AuthNavigationBar from '@/components/auth/AuthNavigationBar';
 
 const RegisterSchema = Yup.object().shape({
 	firstName: Yup.string()
@@ -34,46 +35,34 @@ const RegisterSchema = Yup.object().shape({
 
 export default function Register() {
 	const router = useRouter();
-	const { setUser } = useUser();
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
 
+	//Function to handle register
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
-		console.log(values);
+		// console.log(values);
 		const { confirmPassword, ...data } = values;
 		try {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/register`, data, {
 				withCredentials: true,
 			});
 			showNotification(response.data.message, 'success');
-
-			setUser(response.data.userData);
-			router.push('/auth/verify-email');
-			console.log(response.data);
-			setIsLoading(false);
+			router.push(`${APP_ROUTES.AUTH.VERIFY}`);
+			// console.log(response.data);
 		} catch (error) {
 			console.error(error.response.data);
-			setIsLoading(false);
 			showNotification(
 				error.response?.data?.message || 'An error occurred',
 				'error'
 			);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 	return (
 		<div className='auth-page'>
-			<div className='w-full flex justify-evenly'>
-				<Link href='/auth/login' className='auth-button link link-hover'>
-					Log in
-				</Link>
-				<Link
-					href='/auth/register'
-					className='auth-button link link-hover link-primary'
-				>
-					Register
-				</Link>
-			</div>
+			<AuthNavigationBar active='register' />
 			<div className='flex justify-center'>
 				<div className='auth-form'>
 					<h2 className='text-2xl font-bold mb-4'>Register</h2>

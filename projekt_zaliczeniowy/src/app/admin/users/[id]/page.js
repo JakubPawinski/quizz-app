@@ -4,13 +4,14 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLoading } from '@/providers/LoadingProvider';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 
 export default function AdminUserPage() {
 	const { id } = useParams();
 	const [user, setUser] = useState(null);
 	const { setIsLoading } = useLoading();
 
+	//UseEffect to fetch user data
 	useEffect(() => {
 		const fetchUserData = async () => {
 			setIsLoading(true);

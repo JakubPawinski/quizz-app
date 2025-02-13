@@ -1,17 +1,21 @@
 'use client';
 
 import { useUser } from '@/providers/AuthProvider';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { APP_ROUTES } from '@/config';
 
 export default function Home() {
 	const router = useRouter();
+
+	//Context
 	const { user } = useUser();
+
+	//Function to handle Get Started button
 	const handleGetStarted = () => {
 		console.log('Get Started');
-		if (user) router.push('/quizzes');
+		if (user) router.push(APP_ROUTES.QUIZZES.LIST);
 		else {
-			router.push('/auth/login');
+			router.push(APP_ROUTES.AUTH.LOGIN);
 		}
 	};
 	return (

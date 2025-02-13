@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
-import { APP_ROUTES, ENDPOINTS } from '@/utils/config';
+import { APP_ROUTES, ENDPOINTS } from '@/config';
 import Link from 'next/link';
 import { useChart } from '@/hooks/useChart';
 import Stat from '@/components/admin/Stat';
@@ -12,6 +12,8 @@ import ManageCategories from '@/components/admin/ManageCategories';
 export default function AdminPage() {
 	const [stats, setStats] = useState({});
 	const { setIsLoading } = useLoading();
+
+	//Function to generate colors
 	const generateColors = useCallback((count) => {
 		const colors = [];
 		for (let i = 0; i < count; i++) {
@@ -20,6 +22,7 @@ export default function AdminPage() {
 		}
 		return colors;
 	}, []);
+	//Function to generate border colors
 	const generateBorderColors = useCallback((count) => {
 		const colors = [];
 		for (let i = 0; i < count; i++) {
@@ -28,7 +31,10 @@ export default function AdminPage() {
 		}
 		return colors;
 	}, []);
+
+	//Function to format user data
 	const formatUserData = useCallback((data) => {
+		// Generate last 7 days
 		const last7Days = Array.from({ length: 7 }, (_, i) => {
 			const date = new Date();
 			date.setDate(date.getDate() - i);
@@ -36,9 +42,10 @@ export default function AdminPage() {
 		}).reverse();
 		const result = Array(7).fill(0);
 
-		const formatDate = (date) => {
-			return date.toISOString().split('T')[0];
-		};
+		// Function to format date (YYYY-MM-DD)
+		const formatDate = (date) => date.toISOString().split('T')[0];
+
+		// Fill in the data
 		data.forEach((item) => {
 			const index = last7Days.findIndex(
 				(date) => formatDate(date) === item.date
@@ -47,25 +54,18 @@ export default function AdminPage() {
 				result[index] = item.count;
 			}
 		});
-		const labels = last7Days.map((date) => {
-			const day = date.toLocaleDateString('en-US', { weekday: 'long' });
-			const dateStr = date.toLocaleDateString('en-US', {
-				month: 'short',
-				day: 'numeric',
-			});
-			return `${day} (${dateStr})`;
-		});
 
-		return {
-			data: result,
-			labels: labels,
-		};
+		const labels = last7Days.map(formatDate);
+
+		return { data: result, labels };
 	}, []);
 
-	const roundValue = useCallback((value) => {
+	//Function to format decimal value
+	const formatDecimalValue = useCallback((value) => {
 		return typeof value === 'number' ? Math.round(value * 100) / 100 : 'N/A';
 	}, []);
 
+	//UseEffect to fetch statistics
 	useEffect(() => {
 		const fetchStats = async () => {
 			setIsLoading(true);
@@ -84,6 +84,7 @@ export default function AdminPage() {
 		fetchStats();
 	}, []);
 
+	//Aggregated statistics data
 	const aggregatedStatistics = useMemo(() => {
 		return [
 			{
@@ -100,15 +101,15 @@ export default function AdminPage() {
 			},
 			{
 				label: 'Average Comments per Quiz',
-				value: roundValue(stats.averageCommentsPerQuiz),
+				value: formatDecimalValue(stats.averageCommentsPerQuiz),
 			},
 			{
 				label: 'Average Quizzes per User',
-				value: roundValue(stats.averageQuizzesPerUser),
+				value: formatDecimalValue(stats.averageQuizzesPerUser),
 			},
 			{
 				label: 'Average Quiz Score',
-				value: `${roundValue(stats.averageQuizScore)} pts`,
+				value: `${formatDecimalValue(stats.averageQuizScore)} pts`,
 			},
 			{
 				label: 'Most Popular Achievement',
@@ -121,9 +122,12 @@ export default function AdminPage() {
 		];
 	}, [stats]);
 
+	//Format user data
 	const formattedUserData = formatUserData(
 		stats.usersCreatedLastWeekFormatted || []
 	);
+
+	//Charts data configuration
 	const charts = useMemo(() => {
 		return {
 			barChart: {
@@ -267,6 +271,8 @@ export default function AdminPage() {
 		};
 	}, [stats]);
 
+
+	//Chart refs
 	const barChartRef = useChart(charts.barChart, [stats]);
 	const pieChartCategoriesRef = useChart(charts.pieChartCategories, [stats]);
 	const lineChartRef = useChart(charts.lineChart, [stats]);

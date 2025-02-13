@@ -1,5 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+
+const FADE_DELAY = 5000;
+const HIDE_DELAY = 6000;
+const ANIMATION_DURATION = 1000;
 
 const ICONS = {
 	info: (
@@ -72,7 +76,8 @@ export default function Notification({ message, type = 'info' }) {
 	const [isVisible, setIsVisible] = useState(true);
 	const [isFading, setIsFading] = useState(false);
 
-	const getNotificationStyles = (type) => {
+	//Function to get notification styles
+	const getNotificationStyles = useCallback((type) => {
 		switch (type) {
 			case 'success':
 				return 'bg-success text-success-content';
@@ -85,14 +90,12 @@ export default function Notification({ message, type = 'info' }) {
 			default:
 				return 'bg-neutral text-neutral-content';
 		}
-	};
+	}, []);
 
+	//UseEffect to handle fading and hiding notification
 	useEffect(() => {
-		// console.log('Notification mounted');
-		// console.log('Message:', message);
-		// console.log('Type:', type);
-		const fadeTimeout = setTimeout(() => setIsFading(true), 5000);
-		const hideTimeout = setTimeout(() => setIsVisible(false), 6000);
+		const fadeTimeout = setTimeout(() => setIsFading(true), FADE_DELAY);
+		const hideTimeout = setTimeout(() => setIsVisible(false), HIDE_DELAY);
 
 		return () => {
 			clearTimeout(fadeTimeout);
@@ -104,7 +107,7 @@ export default function Notification({ message, type = 'info' }) {
 
 	return (
 		<div
-			className={`fixed bottom-4 right-4 z-50 transform transition-all duration-1000 
+			className={`fixed bottom-4 right-4 z-50 transform transition-all duration-${ANIMATION_DURATION} 
       ${isFading ? 'opacity-0' : 'opacity-100'}`}
 		>
 			<div

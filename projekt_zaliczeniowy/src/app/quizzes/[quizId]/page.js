@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import QuizGame from '@/components/quiz/game/QuizGame';
 import Comment from '@/components/quiz/comments/comment';
 import AddComment from '@/components/quiz/comments/AddComment';
 import { useUser } from '@/providers/AuthProvider';
+
+const LEADERBOARD_COUNT = 3;
 
 export default function QuizPage() {
 	const [isStarted, setIsStarted] = useState(false);
@@ -16,8 +18,8 @@ export default function QuizPage() {
 	const { quizId } = useParams();
 	const { setIsLoading } = useLoading();
 	const [refreshRank, setRefreshRank] = useState(false);
-	const { user } = useUser();
 
+	//Function to handle comment delete
 	const handleCommentDelete = (commentId) => {
 		setQuiz((prevQuiz) => ({
 			...prevQuiz,
@@ -26,6 +28,7 @@ export default function QuizPage() {
 			),
 		}));
 	};
+	//Function to handle comment added
 	const handleCommentAdded = (newComment) => {
 		setQuiz((prevQuiz) => ({
 			...prevQuiz,
@@ -33,14 +36,13 @@ export default function QuizPage() {
 		}));
 	};
 
+	//UseEffect to fetch quiz data
 	useEffect(() => {
-		// Fetch quiz data
-
 		setIsLoading(true);
 		const fetchQuiz = async () => {
 			try {
 				const response = await axios.get(`${ENDPOINTS.QUIZ}/${quizId}`);
-				// console.log('response:', response.data.data.comments);
+				console.log('response:', response.data.data.comments);
 				setQuiz(response.data.data);
 			} catch (error) {
 				console.error(error);
@@ -50,8 +52,10 @@ export default function QuizPage() {
 		};
 		const fetchQuizRanking = async () => {
 			try {
-				const response = await axios.get(`${ENDPOINTS.RANKING}/${quizId}/3`);
-				console.log('ranking:', response.data.data);
+				const response = await axios.get(
+					`${ENDPOINTS.RANKING}/${quizId}/${LEADERBOARD_COUNT}`
+				);
+				// console.log('ranking:', response.data.data);
 				const ranking = response.data.data ? response.data.data : [];
 				setQuizRanking(ranking);
 			} catch (error) {
@@ -62,6 +66,7 @@ export default function QuizPage() {
 		fetchQuizRanking();
 	}, [quizId, setIsLoading, refreshRank]);
 
+	// If quiz is not loaded yet
 	if (!quiz) {
 		return (
 			<div className='flex justify-center items-center min-h-screen'>
@@ -72,18 +77,16 @@ export default function QuizPage() {
 
 	return (
 		<div className='container mx-auto p-8 min-h-screen bg-base-100'>
-			{/* Header */}
-			<header className='text-center mb-12'>
+			<div className='text-center mb-12'>
 				<h1 className='text-4xl font-bold text-primary mb-4'>{quiz.name}</h1>
 				<p className='text-sm text-base-content/80'>
 					Challenge yourself with this interactive quiz! Test your knowledge,
 					learn something new, and compare your score with others. Are you ready
 					to begin?
 				</p>
-			</header>
+			</div>
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-				{/* Quiz Section */}
 				<div className='lg:col-span-2'>
 					{!isStarted ? (
 						<div className='card bg-base-200 shadow-xl'>
@@ -119,9 +122,9 @@ export default function QuizPage() {
 							<h2 className='card-title text-xl mb-4'>Top Scores</h2>
 							<ul className='space-y-2'>
 								{quizRanking.length > 0 && quizRanking ? (
-									quizRanking.map((user, index) => (
+									quizRanking.map((user) => (
 										<li
-											key={index}
+											key={user.userId}
 											className='flex justify-between items-center p-2 bg-base-100 rounded-lg'
 										>
 											<span className='flex items-center gap-2 font-medium'>
@@ -157,7 +160,7 @@ export default function QuizPage() {
 									.map((comment, index) => {
 										return (
 											<Comment
-												key={index}
+												key={quiz?.comments._id || index}
 												comment={comment}
 												onDelete={handleCommentDelete}
 												quizId={quizId}

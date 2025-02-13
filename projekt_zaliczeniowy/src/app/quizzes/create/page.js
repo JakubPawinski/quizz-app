@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { ENDPOINTS, APP_ROUTES } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/config';
 import axios from 'axios';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -21,28 +21,33 @@ const QuizSchema = Yup.object().shape({
 
 export default function CreateQuizPage() {
 	const [categories, setCategories] = useState([]);
+	const router = useRouter();
+
+	//Context
 	const { showNotification } = useNotification();
 	const { setIsLoading } = useLoading();
 	const { user } = useUser();
-	const router = useRouter();
 
+	//UseEffect to fetch categories data
 	useEffect(() => {
 		const fetchCategories = async () => {
 			const response = await axios.get(`${ENDPOINTS.QUIZ}/categories`);
-			console.log('categories:', response.data.data);
+			// console.log('categories:', response.data.data);
 			setCategories(response.data.data);
 		};
 		fetchCategories();
 	}, []);
+
+	//Function to handle form submission
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
-		console.log('Creating quiz...');
-		console.log(values);
+		// console.log('Creating quiz...');
+		// console.log(values);
 		try {
 			const response = await axios.post(`${ENDPOINTS.QUIZ}`, values, {
 				withCredentials: true,
 			});
-			console.log(response.data);
+			// console.log(response.data);
 			showNotification(response.data.message, 'success');
 			router.push(`${APP_ROUTES.USER.QUIZZES(user._id)}`);
 		} catch (error) {
@@ -55,6 +60,7 @@ export default function CreateQuizPage() {
 			setIsLoading(false);
 		}
 	};
+	
 	return (
 		<div className='p-6 max-w-2xl mx-auto'>
 			<h1 className='text-3xl font-bold text-center mb-8'>Create new quizz</h1>

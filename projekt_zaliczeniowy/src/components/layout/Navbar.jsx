@@ -4,18 +4,25 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '@/providers/AuthProvider';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLayoutEffect, useState } from 'react';
 import { useNotification } from '@/providers/NotificationProvider';
-import { APP_ROUTES } from '@/utils/config';
+import { APP_ROUTES } from '@/config';
 import { useRouter } from 'next/navigation';
+
+const ANCHOR_MOBILE = 920;
+
 export default function Navbar() {
-	const { user, setUser } = useUser();
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const { showNotification } = useNotification();
 	const router = useRouter();
 
+	//Context
+	const { user, setUser } = useUser();
+	const { showNotification } = useNotification();
+
 	const [windowWidth, setWindowWidth] = useState(0);
+
+	//UseLayoutEffect to get window width
 	useLayoutEffect(() => {
 		const handleResize = () => {
 			setWindowWidth(window.innerWidth);
@@ -28,8 +35,11 @@ export default function Navbar() {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	const isMobile = windowWidth < 920;
 
+	//Check if mobile
+	const isMobile = windowWidth < ANCHOR_MOBILE;
+
+	//Function to handle logout
 	const handleLogout = async () => {
 		try {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/logout`, null, {

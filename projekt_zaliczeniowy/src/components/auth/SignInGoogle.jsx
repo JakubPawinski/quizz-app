@@ -1,10 +1,11 @@
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function SignInGoogle() {
 	const [googleUrl, setGoogleUrl] = useState('');
 
+	//UseEffect to fetch google url
 	useEffect(() => {
 		const getGoogleUrl = async () => {
 			const response = await axios.get(`${ENDPOINTS.AUTH}/google`);
@@ -12,6 +13,8 @@ export default function SignInGoogle() {
 		};
 		getGoogleUrl();
 	}, []);
+	
+	//Function to sign in with google
 	const signIn = async () => {
 		window.location.href = googleUrl;
 	};

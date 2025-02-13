@@ -59,7 +59,7 @@ export default function FillInTheBlankQuestion({ onSubmit, defaultValues }) {
 							name='content'
 							as='textarea'
 							className='textarea textarea-bordered w-full h-24 bg-base-100'
-							placeholder='Example: The capital of France is [...]'
+							placeholder='Example: The capital of Poland is [...]'
 						/>
 						{errors.content && touched.content && (
 							<div className='text-error text-sm mt-1'>{errors.content}</div>

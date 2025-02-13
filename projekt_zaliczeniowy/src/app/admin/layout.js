@@ -2,6 +2,7 @@
 import useAuthorization from '@/hooks/useAuthorization';
 
 export default function AdminLayout({ children }) {
+	//Check if user is authorized
 	const authorized = useAuthorization('admin');
 
 	if (!authorized) {

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Link from 'next/link';
 import axios from 'axios';
 import TimeCounter from './TimeCounter';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useUser } from '@/providers/AuthProvider';
 
 import SingleChoiceGame from './questionTypes/SingleChoiceGame';
@@ -13,7 +13,10 @@ import OpenQuestionGame from './questionTypes/OpenQuestionGame';
 import FillInTheBlankGame from './questionTypes/FillInTheBlankGame';
 import Hints from './questionTypes/Hints';
 
-const START_TIME = 1;
+const START_TIME = 3;
+
+const MOVE_TO_NEXT_QUESTION_DELAY = 1000;
+const MOVE_TO_NEXT_QUESTION_DELAY_ON_ANSWER = 2000;
 
 const ACTIONS = {
 	SET_QUESTIONS: 'set_questions',
@@ -66,12 +69,17 @@ const shuffleArray = (array) => _.shuffle(array);
 
 export default function QuizGame({ quiz, onFinish }) {
 	const [state, dispatch] = useReducer(quizReducer, initialState);
+
+	// Context
 	const { user } = useUser();
 
+	// Current question
 	const currentQuestion = useMemo(
 		() => state.questions[state.currentQuestionIndex],
 		[state.questions, state.currentQuestionIndex]
 	);
+
+	// Question type
 	const questionType = useMemo(() => {
 		if (!currentQuestion) return '';
 		const types = {
@@ -83,11 +91,13 @@ export default function QuizGame({ quiz, onFinish }) {
 		return types[currentQuestion.type] || '';
 	}, [currentQuestion]);
 
+	// Shuffle questions
 	useEffect(() => {
 		const shuffledQuestions = shuffleArray([...quiz.questions]);
 		dispatch({ type: ACTIONS.SET_QUESTIONS, payload: shuffledQuestions });
 	}, [quiz]);
 
+	// UseEffect to start timer
 	useEffect(() => {
 		if (state.questions.length > 0 && state.isGameActive && !state.isFinished) {
 			dispatch({
@@ -104,9 +114,9 @@ export default function QuizGame({ quiz, onFinish }) {
 		currentQuestion,
 	]);
 
+	// Function to handle time end
 	const handleTimeEnd = () => {
 		dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: false });
-
 		// console.log('Time out');
 		const newAnswers = {
 			...state.answers,
@@ -117,19 +127,23 @@ export default function QuizGame({ quiz, onFinish }) {
 			payload: newAnswers,
 		});
 
+		// Handle quiz completion
 		if (state.currentQuestionIndex >= state.questions.length - 1) {
 			dispatch({ type: ACTIONS.SET_FINISHED, payload: true });
 			handleQuizComplete(newAnswers);
 			return;
 		}
 
+		// Move to next question
 		setTimeout(() => {
 			dispatch({
 				type: ACTIONS.SET_CURRENT_QUESTION,
 				payload: state.currentQuestionIndex + 1,
 			});
-		}, 1000);
+		}, MOVE_TO_NEXT_QUESTION_DELAY);
 	};
+
+	// Function to download results exported as JSON
 	const handleDownloadResults = () => {
 		if (!state.statistics) return;
 
@@ -155,6 +169,7 @@ export default function QuizGame({ quiz, onFinish }) {
 		URL.revokeObjectURL(url);
 	};
 
+	// Function to handle answer
 	const handleAnswer = (answer) => {
 		dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: false });
 		dispatch({ type: ACTIONS.SET_SHOWING_ANSWER, payload: true });
@@ -184,9 +199,10 @@ export default function QuizGame({ quiz, onFinish }) {
 				});
 				dispatch({ type: ACTIONS.SET_TIMER_ACTIVE, payload: true });
 			}
-		}, 2000);
+		}, MOVE_TO_NEXT_QUESTION_DELAY_ON_ANSWER);
 	};
 
+	// Function to handle quiz completion
 	const handleQuizComplete = async (finalAnswers) => {
 		console.log('Final answers:', finalAnswers);
 		const formattedAnswers = {
@@ -230,6 +246,7 @@ export default function QuizGame({ quiz, onFinish }) {
 		}
 	};
 
+	// Function to render question
 	const renderQuestion = () => {
 		if (!currentQuestion) return null;
 
@@ -272,6 +289,7 @@ export default function QuizGame({ quiz, onFinish }) {
 		);
 	};
 
+	// If quiz is finished
 	if (state.isFinished) {
 		return (
 			<div className='text-center p-8'>
@@ -294,7 +312,7 @@ export default function QuizGame({ quiz, onFinish }) {
 						<div className='stat'>
 							<div className='stat-title'>Accuracy</div>
 							<div className='stat-value text-accent'>
-								{state.statistics?.correctAnswersPercentage}%
+								{state.statistics?.correctAnswersPercentage.toFixed(2)}%
 							</div>
 							<div className='stat-desc'>of answers were correct</div>
 						</div>

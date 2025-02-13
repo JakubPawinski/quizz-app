@@ -10,20 +10,20 @@ export default function FillInTheBlankGame({
 		return question.answers.map(() => '');
 	});
 	const [submittedAnswers, setSubmittedAnswers] = useState([]);
-	const [isCorrect, setIsCorrect] = useState(null);
 
+	// Function to handle form submission
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		const trimmedAnswers = answers.map((answer) => answer.trim());
 		if (trimmedAnswers.every((answer) => answer)) {
 			setSubmittedAnswers(trimmedAnswers);
 			const correct = checkAnswers(trimmedAnswers);
-			setIsCorrect(correct);
 			onAnswer(trimmedAnswers);
 			// console.log('Submitted answers:', trimmedAnswers);
 		}
 	};
 
+	// Function to check answers
 	const checkAnswers = (submittedAnswers) => {
 		return submittedAnswers.every(
 			(answer, index) =>
@@ -31,6 +31,7 @@ export default function FillInTheBlankGame({
 		);
 	};
 
+	// Function to handle input change
 	const handleInputChange = (index, value) => {
 		const newAnswers = [...answers];
 		newAnswers[index] = value;
@@ -83,6 +84,7 @@ export default function FillInTheBlankGame({
 		});
 	};
 
+	// Function to get answer class name
 	const getAnswerClassName = (isCorrectAnswer) => {
 		return isCorrectAnswer
 			? ' textarea-bordered border-2 border-success bg-success/10'

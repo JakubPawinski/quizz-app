@@ -1,14 +1,13 @@
 'use client';
-import { ENDPOINTS } from '@/utils/config';
-import { useState, useEffect, useLayoutEffect } from 'react';
-import { useLoading } from '@/providers/LoadingProvider';
+import { ENDPOINTS } from '@/config';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import QuizList from '@/components/quiz/QuizList';
 
 export default function QuizzesPage() {
 	const [quizzes, setQuizzes] = useState([]);
-	const { setIsLoading } = useLoading();
 
+	//UseEffect to fetch all quizzes
 	useEffect(() => {
 		const fetchAllQuizzes = async () => {
 			const response = await axios.get(`${ENDPOINTS.QUIZ}/all`);

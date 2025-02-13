@@ -69,6 +69,28 @@ export default function OpenQuestion({ onSubmit, defaultValues }) {
 							</div>
 						)}
 					</div>
+					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+						<div>
+							<Field
+								name='hint'
+								className='input input-bordered input-sm w-full bg-base-100'
+								placeholder='Hint (optional)'
+							/>
+						</div>
+						<div>
+							<Field
+								type='number'
+								name='timeLimit'
+								className='input input-bordered input-sm w-full bg-base-100'
+								placeholder='Time limit (seconds)'
+							/>
+							{errors.timeLimit && touched.timeLimit && (
+								<div className='text-error text-sm mt-1'>
+									{errors.timeLimit}
+								</div>
+							)}
+						</div>
+					</div>
 
 					<button
 						type='submit'

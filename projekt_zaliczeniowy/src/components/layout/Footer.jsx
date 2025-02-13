@@ -13,11 +13,11 @@ export default function Footer() {
 						<Link href='/' className='text-primary hover:text-primary-content'>
 							Home
 						</Link>
-						<Link href='/' className='text-primary hover:text-primary-content'>
-							About
-						</Link>
-						<Link href='/' className='text-primary hover:text-primary-content'>
-							Contact
+						<Link
+							href='/auth/login'
+							className='text-primary hover:text-primary-content'
+						>
+							Get Started
 						</Link>
 					</div>
 				</div>

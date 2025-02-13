@@ -11,11 +11,13 @@ export default function MultipleChoiceGame({
 	const [selectedAnswers, setSelectedAnswers] = useState([]);
 	const { handleEliminateOne, eliminatedAnswers } = useElimination();
 
+
 	const handleEliminate = () => {
 		setSelectedAnswers([]);
 		handleEliminateOne(question.answers);
 	};
 
+	// Function to get option class name
 	const getOptionClassName = (option) => {
 		const eliminatedStyle = eliminatedAnswers.includes(option)
 			? 'opacity-50 line-through cursor-not-allowed'
@@ -39,6 +41,7 @@ export default function MultipleChoiceGame({
 		return 'flex items-center gap-3 p-4 rounded-lg border-2 bg-base-100';
 	};
 
+	// Function to handle option click
 	const handleOptionClick = (option) => {
 		if (eliminatedAnswers.includes(option)) return;
 		if (!showingAnswer) {
@@ -50,6 +53,7 @@ export default function MultipleChoiceGame({
 		}
 	};
 
+	// Function to handle form submit
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (selectedAnswers.length > 0) {

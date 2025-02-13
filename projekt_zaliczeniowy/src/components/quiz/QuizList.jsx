@@ -3,6 +3,8 @@ import QuizCard from './QuizCard';
 import { useState, useLayoutEffect, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const ANCHOR_MOBILE = 440;
+
 export default function QuizList({ quizzes }) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -14,6 +16,7 @@ export default function QuizList({ quizzes }) {
 	const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name');
 	const [filteredQuizzes, setFilteredQuizzes] = useState(quizzes);
 
+	// Update search term and sort by when query params change
 	useEffect(() => {
 		const currentSearchTerm = searchParams.get('search') || '';
 		const currentSortBy = searchParams.get('sort') || 'name';
@@ -22,6 +25,7 @@ export default function QuizList({ quizzes }) {
 		setSortBy(currentSortBy);
 	}, [searchParams]);
 
+	// Update query params when search term or sort by changes
 	const updateQueryParams = (search, sort) => {
 		const params = new URLSearchParams(searchParams.toString());
 		if (search) {
@@ -36,6 +40,8 @@ export default function QuizList({ quizzes }) {
 		}
 		router.push(`?${params.toString()}`, { scroll: false });
 	};
+
+	// Handle search and sort change
 	const handleSearchChange = (e) => {
 		const value = e.target.value;
 		setSearchTerm(value);
@@ -47,6 +53,7 @@ export default function QuizList({ quizzes }) {
 		updateQueryParams(searchTerm, value);
 	};
 
+	// Update window width on resize
 	useLayoutEffect(() => {
 		const handleResize = () => {
 			setWindowWidth(window.innerWidth);
@@ -60,6 +67,7 @@ export default function QuizList({ quizzes }) {
 		};
 	}, []);
 
+	// Filter and sort quizzes
 	useEffect(() => {
 		const filtered = quizzes
 			.filter(
@@ -86,7 +94,10 @@ export default function QuizList({ quizzes }) {
 			});
 		setFilteredQuizzes(filtered);
 	}, [quizzes, searchTerm, sortBy]);
-	const isMobile = windowWidth < 440;
+
+	// Check if mobile
+	const isMobile = windowWidth < ANCHOR_MOBILE;
+
 	return (
 		<div className='flex flex-wrap justify-center'>
 			<div className='w-full max-w-7xl flex flex-col sm:flex-row gap-4 justify-between items-center mb-4'>

@@ -5,37 +5,45 @@ import MultipleChoiceQuestion from './create/MultipleChoiceQuestion';
 import OpenQuestion from './create/OpenQuestion';
 import FillInTheBlankQuestion from './create/FillInTheBlankQuestion';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useNotification } from '@/providers/NotificationProvider';
 
 export default function QuestionManager({ question, quizId }) {
 	const [selectedType, setSelectedType] = useState(question?.type || '');
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+	//Context
 	const { showNotification } = useNotification();
 
+	//UseEffect to check if the question is a placeholder
 	useEffect(() => {
 		if (question.placeholder) {
 			setIsDetailsOpen(true);
 		}
 	}, []);
 
+	//Function to handle the change of the question type
 	const handleTypeChange = (type) => {
 		setSelectedType(type);
 		// console.log('Selected type:', type);
 	};
+
+	//UseEffect to check if the question type is selected
 	useEffect(() => {
 		if (question && question.type) {
-			console.log('Selected type:', question.type);
+			// console.log('Selected type:', question.type);
 			setSelectedType(question.type);
 		}
 	}, [question]);
 
+	//Function to handle the submit of the question
 	const handleSubmit = async (values) => {
-		console.log(values);
+		console.log('Handle submit');
+		// console.log(values);
 		// console.log('quizId:', quizId);
 
 		try {
-			console.log(question.placeholder);
+			// console.log(question.placeholder);
 			if (question.placeholder) {
 				// console.log('Create question:', values);
 				const response = await axios.post(
@@ -84,10 +92,10 @@ export default function QuestionManager({ question, quizId }) {
 			// console.log('response:', response);
 			showNotification('Question deleted successfully', 'success');
 		} catch (error) {
-			// console.error(error);
+			console.error(error);
 			showNotification(error.response.data.message, 'error');
 		} finally {
-			console.log('dispatchEvent');
+			// console.log('dispatchEvent');
 			dispatchEvent(new Event('refreshQuiz'));
 		}
 	};

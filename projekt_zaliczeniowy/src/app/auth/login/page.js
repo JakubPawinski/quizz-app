@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/config';
 import { useUser } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/providers/LoadingProvider';
 import SignInGoogle from '@/components/auth/SignInGoogle';
 import { useNotification } from '@/providers/NotificationProvider';
+import AuthNavigationBar from '@/components/auth/AuthNavigationBar';
 import { useState } from 'react';
 
 const LoginSchema = Yup.object().shape({
@@ -22,12 +23,14 @@ const TempPasswordSchema = Yup.object().shape({
 
 export default function Login() {
 	const router = useRouter();
+	const [showTempPasswordForm, setShowTempPasswordForm] = useState(false);
+
+	//Context
 	const { setUser } = useUser();
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
 
-	const [showTempPasswordForm, setShowTempPasswordForm] = useState(false);
-
+	//Function to handle temporary password request
 	const handleTempPassword = async (values) => {
 		if (!values.email) {
 			setShowTempPasswordForm((prev) => !prev);
@@ -57,10 +60,10 @@ export default function Login() {
 		}
 	};
 
+	//Function to handle login
 	const handleSubmit = async (values) => {
 		setIsLoading(true);
-		console.log(values);
-
+		// console.log(values);
 		try {
 			const response = await axios.post(`${ENDPOINTS.AUTH}/login`, values, {
 				withCredentials: true,
@@ -68,10 +71,9 @@ export default function Login() {
 			if (response.data?.message) {
 				showNotification(response.data.message, 'success');
 			}
-			console.log(response);
-
+			// console.log(response);
 			setUser(response.data.userData);
-			router.push('/quizzes');
+			router.push(`${APP_ROUTES.QUIZZES.LIST}`);
 			console.log(response.data);
 			setIsLoading(false);
 		} catch (error) {
@@ -86,17 +88,7 @@ export default function Login() {
 
 	return (
 		<div className='auth-page'>
-			<div className='w-full flex justify-evenly'>
-				<Link
-					href='/auth/login'
-					className='auth-button link link-hover link-primary'
-				>
-					Log in
-				</Link>
-				<Link href='/auth/register' className='auth-button link link-hover'>
-					Register
-				</Link>
-			</div>
+			<AuthNavigationBar active='login' />
 			<div className='flex justify-center'>
 				<div className='auth-form'>
 					<h2 className='text-2xl font-bold mb-4'>Login</h2>

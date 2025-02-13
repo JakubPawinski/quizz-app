@@ -1,17 +1,20 @@
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
-import { useState } from 'react';
 import { useNotification } from '@/providers/NotificationProvider';
+
 const CategorySchema = Yup.object().shape({
 	name: Yup.string().required('Category name is required'),
 });
 
 export default function AddQuizCategory() {
+	//Context
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
+
+	//Function to handle adding category
 	const handleAddCategory = async (values, { resetForm }) => {
 		setIsLoading(true);
 		try {
@@ -23,6 +26,7 @@ export default function AddQuizCategory() {
 				'success'
 			);
 			resetForm();
+			dispatchEvent(new Event('refreshCategories'));
 		} catch (error) {
 			console.error('Error adding category:', error);
 			showNotification(

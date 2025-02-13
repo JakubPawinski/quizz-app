@@ -1,17 +1,21 @@
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { APP_ROUTES } from '@/utils/config';
+import { APP_ROUTES } from '@/config';
 import { useUser } from '@/providers/AuthProvider';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useNotification } from '@/providers/NotificationProvider';
 
 export default function QuizCard({ quiz }) {
 	const pathname = usePathname();
 	const router = useRouter();
+
+	//Context
 	const { user } = useUser();
 	const { showNotification } = useNotification();
+
+	//Function to get the color of the difficulty
 	const getDifficultyColor = (difficulty) => {
 		switch (difficulty) {
 			case 'Easy':
@@ -25,6 +29,7 @@ export default function QuizCard({ quiz }) {
 		}
 	};
 
+	//Function to handle the click on the card
 	const handleClick = () => {
 		// console.log('Handle click');
 		// console.log('quiz:', quiz);
@@ -42,13 +47,14 @@ export default function QuizCard({ quiz }) {
 		}
 	};
 
+	//Function to handle the delete of the quiz
 	const handleDelete = async () => {
-		console.log('Delete quiz');
+		// console.log('Delete quiz');
 		try {
 			const response = await axios.delete(`${ENDPOINTS.QUIZ}/${quiz._id}`, {
 				withCredentials: true,
 			});
-			console.log('response:', response.data);
+			// console.log('response:', response.data);
 			showNotification('Quiz deleted successfully', 'success');
 			dispatchEvent(new Event('refreshQuizzes'));
 		} catch (error) {

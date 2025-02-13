@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useUser } from '@/providers/AuthProvider';
@@ -10,10 +10,13 @@ import UserManagment from '@/components/user/UserManagment';
 
 export default function UserPage() {
 	const { id } = useParams();
-	const { user } = useUser();
-	const { setIsLoading } = useLoading();
 	const [achievements, setAchievemnts] = useState([]);
+	
+	//Context
+	const { setIsLoading } = useLoading();
+	const { user } = useUser();
 
+	//UseEffect to fetch user achievements
 	useEffect(() => {
 		const fetchUserAchievements = async () => {
 			setIsLoading(true);

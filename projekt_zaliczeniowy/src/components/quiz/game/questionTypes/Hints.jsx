@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 export default function Hints({ question, showingAnswer }) {
 	const [showHint, setShowHint] = useState(false);
 
+	// useEffect to hide hint when showing answer
 	useEffect(() => {
 		if (showingAnswer) {
 			setShowHint(false);

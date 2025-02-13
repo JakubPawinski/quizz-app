@@ -1,18 +1,21 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 import { useLoading } from '@/providers/LoadingProvider';
+
+const LEADERBOARD_COUNT = 10;
 
 export default function LeaderboardPage() {
 	const [leaderboard, setLeaderboard] = useState([]);
 	const { setIsLoading } = useLoading();
 
+	//UseEffect to fetch leaderboard
 	useEffect(() => {
 		const fetchLeaderboard = async () => {
 			setIsLoading(true);
 			try {
-				const response = await axios.get(`${ENDPOINTS.RANKING}/global/10`);
+				const response = await axios.get(`${ENDPOINTS.RANKING}/global/${LEADERBOARD_COUNT}`);
 				setLeaderboard(response.data.data);
 			} catch (error) {
 				console.error('Error fetching leaderboard:', error);
@@ -24,6 +27,7 @@ export default function LeaderboardPage() {
 		fetchLeaderboard();
 	}, [setIsLoading]);
 
+	//Function to get medal color
 	const getMedalColor = (rank) => {
 		switch (rank) {
 			case 1:

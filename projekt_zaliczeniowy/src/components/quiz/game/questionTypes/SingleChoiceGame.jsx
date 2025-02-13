@@ -10,11 +10,13 @@ export default function SingleChoiceGame({
 	const [selectedAnswer, setSelectedAnswer] = useState(null);
 	const { handleEliminateOne, eliminatedAnswers } = useElimination();
 
+	// Function to handle elimination
 	const handleEliminate = () => {
 		setSelectedAnswer([]);
 		handleEliminateOne(question.answers);
 	};
 
+	// Function to get option class name
 	const getOptionClassName = (option) => {
 		const eliminatedStyle = eliminatedAnswers.includes(option)
 			? 'opacity-50 line-through cursor-not-allowed'
@@ -38,6 +40,7 @@ export default function SingleChoiceGame({
 		return 'flex items-center gap-3 p-4 rounded-lg border-2 bg-base-100';
 	};
 
+	// Function to handle form submission
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (selectedAnswer) {
@@ -103,25 +106,6 @@ export default function SingleChoiceGame({
 					</form>
 				</div>
 			</div>
-
-			{question.hint && (
-				<div className='alert alert-info'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						fill='none'
-						viewBox='0 0 24 24'
-						className='stroke-current shrink-0 w-6 h-6'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth='2'
-							d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-						></path>
-					</svg>
-					<span>Hint: {question.hint}</span>
-				</div>
-			)}
 		</div>
 	);
 }

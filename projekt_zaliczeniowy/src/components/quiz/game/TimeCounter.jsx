@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 export default function TimeCounter({ time, onTimeEnd, isActive }) {
 	const [timeLeft, setTimeLeft] = useState(time);
 
+	// Reset time when time prop changes
 	useEffect(() => {
 		setTimeLeft(time);
 	}, [time]);
 
+	// Start countdown
 	useEffect(() => {
 		let timer;
 		if (isActive && timeLeft > 0) {
@@ -18,6 +20,7 @@ export default function TimeCounter({ time, onTimeEnd, isActive }) {
 		return () => clearInterval(timer);
 	}, [timeLeft, isActive]);
 
+	// Check if time is up
 	useEffect(() => {
 		if (timeLeft <= 0 && isActive) {
 			onTimeEnd?.();

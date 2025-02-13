@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useNotification } from '@/providers/NotificationProvider';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS, APP_ROUTES } from '@/config';
 import axios from 'axios';
 import * as Yup from 'yup';
 
@@ -14,22 +14,25 @@ const VerifySchema = Yup.object().shape({
 
 export default function VerifyPage() {
 	const router = useRouter();
+
+	//Context
 	const { setIsLoading } = useLoading();
 	const { showNotification } = useNotification();
 
-	const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
+	//Function to handle verification
+	const handleSubmit = async (values) => {
 		console.log(values);
 		try {
-			console.log('Verifying email...');
+			// console.log('Verifying email...');
 			setIsLoading(true);
-			console.log(`${ENDPOINTS.AUTH}/verify-email`);
+			// console.log(`${ENDPOINTS.AUTH}/verify-email`);
 			const response = await axios.post(`${ENDPOINTS.AUTH}/verify-email`, {
 				email: values.email,
 				hash: values.code,
 			});
 			showNotification(response.data.message, 'success');
-			console.log(response.data);
-			router.push('/auth/login');
+			// console.log(response.data);
+			router.push(`${APP_ROUTES.AUTH.LOGIN}`);
 		} catch (error) {
 			console.log(error.response.data);
 			showNotification(
@@ -38,7 +41,6 @@ export default function VerifyPage() {
 			);
 		} finally {
 			setIsLoading(false);
-			setSubmitting(false);
 		}
 	};
 	return (

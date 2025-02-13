@@ -1,22 +1,28 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { ENDPOINTS } from '@/utils/config';
+import { useState, useEffect, useCallback } from 'react';
+import { ENDPOINTS } from '@/config';
+import useEventListener from '@/hooks/useEventListener';
 import axios from 'axios';
 
 export default function ManageCategories() {
 	const [categories, setCategories] = useState([]);
+
+	const fetchCategories = useCallback(async () => {
+		try {
+			const response = await axios.get(`${ENDPOINTS.QUIZ}/categories`);
+			setCategories(response.data.data);
+		} catch (error) {
+			console.error(error);
+		}
+	}, []);
+	//UseEffect to fetch categories data
 	useEffect(() => {
-		const fetchCategories = async () => {
-			try {
-				const response = await axios.get(`${ENDPOINTS.QUIZ}/categories`);
-				setCategories(response.data.data);
-			} catch (error) {
-				console.error(error);
-			}
-		};
 		fetchCategories();
 	}, []);
 
+	useEventListener('refreshCategories', fetchCategories);
+
+	//Function to delete category
 	const handleDeleteCategory = async (categoryId) => {
 		try {
 			const response = await axios.delete(

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { APP_ROUTES } from '@/utils/config';
+import { APP_ROUTES } from '@/config';
 import { useNotification } from '@/providers/NotificationProvider';
 import { useUser } from '@/providers/AuthProvider';
 

@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { APP_ROUTES } from '@/utils/config';
+import { APP_ROUTES } from '@/config';
 import QuizList from '@/components/quiz/QuizList';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useUser } from '@/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { ENDPOINTS } from '@/utils/config';
+import { ENDPOINTS } from '@/config';
 
 export default function UserQuizzesPage() {
 	const { user, isLoaded } = useUser();
@@ -16,15 +16,18 @@ export default function UserQuizzesPage() {
 	const { setIsLoading } = useLoading();
 	const router = useRouter();
 
+	//useEffect to fetch user quizzes
 	useEffect(() => {
 		if (!isLoaded) {
 			return;
 		}
 		// console.log('user quiz page:', user);
 		const fetchUserQuizzes = async () => {
+			console.log('fetchUserQuizzes');
 			setIsLoading(true);
 			try {
 				const response = await axios.get(`${ENDPOINTS.USER}/${user._id}`);
+				console.log('response:', response.data);
 				const quizPromises = response.data.quizzes.map((quizId) =>
 					axios.get(`${ENDPOINTS.QUIZ}/${quizId}`, {
 						withCredentials: true,
@@ -34,14 +37,15 @@ export default function UserQuizzesPage() {
 				const quizzesData = quizzesResponse.map((quiz) => quiz.data.data);
 				// console.log('response:', quizPromises);
 				setQuizzes(quizzesData);
-				setIsLoading(false);
 			} catch (error) {
 				console.error(error);
+			} finally {
 				setIsLoading(false);
 			}
 		};
 		fetchUserQuizzes();
 	}, [user, isLoaded, setIsLoading]);
+
 	return (
 		<div className='min-h-screen p-8'>
 			<div className='max-w-7xl mx-auto'>
