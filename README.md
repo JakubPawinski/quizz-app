@@ -13,13 +13,13 @@ Quiz App is an interactive web application that allows users to create and solve
 
 ## 📸 Screenshots
 
-![Quiz App Login page](image.png)
-![Quiz App Homepage](image-1.png)
-![Quiz App My quizzes page](image-2.png)
-![Quiz App Leaderboard page](image-3.png)
-![Quiz App Progile managment page](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
+![Quiz App Login page](./screenshots/image.png)
+![Quiz App Homepage](./screenshots/image-1.png)
+![Quiz App My quizzes page](./screenshots/image-2.png)
+![Quiz App Leaderboard page](./screenshots/image-3.png)
+![Quiz App Progile managment page](./screenshots/image-4.png)
+![alt text](./screenshots/image-5.png)
+![alt text](./screenshots/image-6.png)
 
 ## 🛠️ Technologies
 
