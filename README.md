@@ -13,27 +13,69 @@ Quiz App is an interactive web application that allows users to create and solve
 
 ## 📸 Screenshots
 
-![Quiz App Login page](./screenshots/image.png)
-![Quiz App Homepage](./screenshots/image-1.png)
-![Quiz App My quizzes page](./screenshots/image-2.png)
-![Quiz App Leaderboard page](./screenshots/image-3.png)
-![Quiz App Progile managment page](./screenshots/image-4.png)
-![alt text](./screenshots/image-5.png)
-![alt text](./screenshots/image-6.png)
+### Login Page
+
+![Quiz App Login page](./screenshots/loginPage.png)
+
+### Main Screens
+
+![Quiz App Homepage](./screenshots/QuizzesPage.png)
+
+### Admin Panel
+
+![Quiz App Admin dashboard page](./screenshots/AdminDashboard.png)
+![Quiz App My quizzes page](./screenshots/ManageUserPage.png)
+
+### Leaderboard
+
+![Quiz App Leaderboard page](./screenshots/LeaderboardPage.png)
+
+### User Profile
+
+![Quiz App Profile management page](./screenshots/ProfilePage.png)
+![Quiz App My quizzes page](./screenshots/MyQuizzesPage.png)
+
+### Quiz Gameplay
+
+![Quiz Gameplay interface - multiple choice question](./screenshots/MultipleChoiceQuestion.png)
+![Quiz Gameplay interface - open question](./screenshots/OpenQuestion.png)
 
 ## 🛠️ Technologies
 
-- **Frontend:** React.js, CSS/SCSS, TypeScript
-- **Backend:** Node.js, Express
+- **Frontend:** React.js, Next.js, Tailwind
+- **Backend:** Node.js, Express.js
 - **Database:** MongoDB
-- **Authentication:** JWT
-- **Hosting:** Vercel/Netlify
+- **Authentication:** JWT, OAuth
 
-## 📋 Requirements
+## 📂 Project Structure
 
-- Node.js v14+
-- MongoDB
-- NPM or Yarn
+```
+QuizzApp/
+├── public/              # Static files
+├── src/
+│   ├── app/             # Next.js app router pages
+│   │   ├── admin/       # Admin dashboard pages
+│   │   ├── auth/        # Authentication pages
+│   │   ├── quizzes/     # Quiz creation and playing
+│   │   ├── user/        # User profile pages
+│   │   └── leaderboard/ # Leaderboard page
+│   ├── components/      # Reusable components
+│   │   ├── admin/       # Admin-specific components
+│   │   ├── layout/      # Layout components (Navbar, Footer)
+│   │   ├── auth/        # Authentication components
+│   │   ├── quiz/        # Quiz-related components
+│   │   │   ├── game/    # Quiz gameplay components
+│   │   │   ├── create/  # Quiz creation components
+│   │   │   └── comments/# Quiz comments components
+│   │   └── user/        # User-related components
+│   ├── providers/       # React context providers
+│   ├── hooks/           # Custom React hooks
+│   └── config.js        # App configuration
+├── .eslintrc.json       # ESLint configuration
+├── jsconfig.json        # JavaScript configuration
+├── next.config.js       # Next.js configuration
+└── tailwind.config.js   # Tailwind CSS configuration
+```
 
 ## 👤 Author
 
